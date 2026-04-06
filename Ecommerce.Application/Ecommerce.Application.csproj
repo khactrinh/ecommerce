@@ -8,11 +8,18 @@
 
   <ItemGroup>
     <PackageReference Include="FluentValidation" Version="12.1.1" />
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
     <PackageReference Include="MediatR" Version="14.1.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Ecommerce.Domain\Ecommerce.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Catalog\Products\CreateProduct\" />
+    <Folder Include="Catalog\Products\GetProducts\" />
+    <Folder Include="Orders\Commands\CreateOrder\" />
   </ItemGroup>
 
 </Project>

@@ -1,7 +1,9 @@
+using Ecommerce.Application.Cart.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Ecommerce.Application.Catalog.Products.Interfaces;
+using Ecommerce.Application.Common.Interfaces;
 using Ecommerce.Application.Interfaces;
 using Ecommerce.Infrastructure.Persistence;
 using Ecommerce.Infrastructure.Persistence.Repositories;
@@ -27,6 +29,10 @@ public static class DependencyInjection
 
         // ⚡ Read side (Dapper)
         services.AddScoped<IProductReadService, ProductReadService>();
+        
+        services.AddScoped<IOrderRepository, OrderRepository>();
+        
+        services.AddScoped<ICartRepository, CartRepository>();
 
         return services;
     }

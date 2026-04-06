@@ -1,6 +1,8 @@
 using Microsoft.Extensions.DependencyInjection;
 using MediatR;
 using System.Reflection;
+using Ecommerce.Application.Common.Behaviors;
+using FluentValidation;
 
 namespace Ecommerce.Application;
 
@@ -11,6 +13,12 @@ public static class DependencyInjection
         services.AddMediatR(cfg =>
             cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly())
         );
+        
+        // FluentValidation
+        services.AddValidatorsFromAssembly(typeof(DependencyInjection).Assembly);
+
+        // Pipeline
+        services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 
         return services;
     }
