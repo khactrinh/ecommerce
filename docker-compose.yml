@@ -1,0 +1,23 @@
+services:
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: ecommerce
+    ports:
+      - "5433:5432"
+
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+  api:
+    build:
+      context: .
+      dockerfile: Ecommerce.Api/Dockerfile
+    ports:
+      - "5001:8080"
+    depends_on:
+      - postgres
+      - redis

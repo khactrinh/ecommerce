@@ -1,0 +1,31 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Design;
+using Microsoft.Extensions.Configuration;
+
+namespace Ecommerce.Infrastructure.Persistence;
+
+public class AppDbContextFactory 
+    : IDesignTimeDbContextFactory<AppDbContext>
+{
+    public AppDbContext CreateDbContext(string[] args)
+    {
+        var basePath = Path.Combine(Directory.GetCurrentDirectory(), "../Ecommerce.Api");
+
+        var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") 
+                          ?? "Development";
+
+        var configuration = new ConfigurationBuilder()
+            .SetBasePath(basePath)
+            .AddJsonFile("appsettings.json", optional: false)
+            .AddJsonFile($"appsettings.{environment}.json", optional: true)
+            .AddEnvironmentVariables()
+            .Build();
+
+        var connectionString = configuration.GetConnectionString("DefaultConnection");
+
+        var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
+        optionsBuilder.UseNpgsql(connectionString);
+
+        return new AppDbContext(optionsBuilder.Options);
+    }
+}
