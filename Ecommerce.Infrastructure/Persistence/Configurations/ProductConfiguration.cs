@@ -1,6 +1,6 @@
+using Ecommerce.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Ecommerce.Domain.Entities;
 
 namespace Ecommerce.Infrastructure.Persistence.Configurations;
 
@@ -8,18 +8,22 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
 {
     public void Configure(EntityTypeBuilder<Product> builder)
     {
-        builder.ToTable("Products");
+        builder.ToTable("products"); // 👈 lowercase plural
 
         builder.HasKey(x => x.Id);
 
+        builder.Property(x => x.Id)
+            .HasColumnName("id");
+
         builder.Property(x => x.Name)
+            .HasColumnName("name")
             .IsRequired()
             .HasMaxLength(200);
 
         builder.Property(x => x.Price)
-            .HasPrecision(18, 2);
+            .HasColumnName("price");
 
         builder.Property(x => x.Stock)
-            .IsRequired();
+            .HasColumnName("stock");
     }
 }
