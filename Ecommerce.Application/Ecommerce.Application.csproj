@@ -18,7 +18,6 @@
 
   <ItemGroup>
     <Folder Include="Catalog\Products\CreateProduct\" />
-    <Folder Include="Catalog\Products\GetProducts\" />
     <Folder Include="Orders\Commands\CreateOrder\" />
   </ItemGroup>
 

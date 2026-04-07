@@ -1,5 +1,5 @@
+using Ecommerce.Application.Catalog.GetProducts;
 using Ecommerce.Application.Catalog.Products.Commands;
-using Ecommerce.Application.Catalog.Products.Queries;
 
 namespace Ecommerce.Api.Controllers;
 
@@ -25,9 +25,14 @@ public class ProductController : ControllerBase
     }
     
     [HttpGet]
-    public async Task<IActionResult> Get(int page = 1, int pageSize = 10)
+    public async Task<IActionResult> Get(
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 12,
+        [FromQuery] string? search = null)
     {
-        var result = await _mediator.Send(new GetProductsQuery(page, pageSize));
+        var result = await _mediator.Send(
+            new GetProductsQuery(page, pageSize, search));
+
         return Ok(result);
     }
 }
