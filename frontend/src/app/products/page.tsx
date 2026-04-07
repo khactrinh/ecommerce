@@ -1,41 +1,40 @@
-import { fetcher } from "@/lib/api";
-import ProductCard from "@/components/product/product-card";
-import { PagedResult, Product } from "@/types/product";
+"use client";
 
-async function getProducts(page: number) {
-  return fetcher<PagedResult<Product>>(
-    `/api/products?page=${page}&pageSize=12`,
-  );
-}
+import { useProducts } from "@/hooks/useProducts";
+import ProductGrid from "@/components/product/product-grid";
 
-export default async function ProductsPage({
+export default function ProductsPage({
   searchParams,
 }: {
   searchParams: { page?: string };
 }) {
   const page = Number(searchParams.page || 1);
 
-  const data = await getProducts(page);
+  const { data, isLoading } = useProducts(page, 12);
+
+  if (isLoading) {
+    return <div className="p-6">Loading...</div>;
+  }
 
   const totalPages = Math.ceil(data.total / data.pageSize);
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">Products</h1>
+    <div className="p-6 max-w-7xl mx-auto">
+      {/* Header */}
+      <h1 className="text-2xl font-bold mb-6">Sản phẩm</h1>
 
-      <div className="grid grid-cols-4 gap-4">
-        {data.items.map((p) => (
-          <ProductCard key={p.id} product={p} />
-        ))}
-      </div>
+      {/* Grid */}
+      <ProductGrid products={data.items} />
 
       {/* Pagination */}
-      <div className="mt-6 flex gap-2">
+      <div className="mt-8 flex justify-center gap-2">
         {Array.from({ length: totalPages }).map((_, i) => (
           <a
             key={i}
             href={`?page=${i + 1}`}
-            className="px-3 py-1 border rounded"
+            className={`px-3 py-1 border rounded ${
+              i + 1 === page ? "bg-black text-white" : ""
+            }`}
           >
             {i + 1}
           </a>

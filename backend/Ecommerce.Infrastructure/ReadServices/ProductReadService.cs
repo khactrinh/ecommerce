@@ -31,7 +31,7 @@ public class ProductReadService : IProductReadService
         }
 
         var sql = $@"
-            SELECT id, name, price, stock
+            SELECT id, name, price, stock, image_url
             FROM products
             {whereClause}
             ORDER BY name

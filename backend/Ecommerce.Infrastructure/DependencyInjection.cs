@@ -26,7 +26,7 @@ public static class DependencyInjection
         services.AddDbContext<AppDbContext>(options =>
             options.UseNpgsql(
                 configuration.GetConnectionString("DefaultConnection")
-            )//.UseSnakeCaseNamingConvention()
+            ).UseSnakeCaseNamingConvention()
         );
         
         // =============================

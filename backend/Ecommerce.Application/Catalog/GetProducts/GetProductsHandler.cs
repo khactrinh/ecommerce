@@ -1,5 +1,6 @@
 using Ecommerce.Application.Common.Models;
 using MediatR;
+using Ecommerce.Application.Common.Extensions;
 
 namespace Ecommerce.Application.Catalog.GetProducts;
 
@@ -23,6 +24,9 @@ public class GetProductsHandler
             request.Search
         );
 
+        //var mapper = new ProductMapper();
+        //return items.Map(p => mapper.ToDto(p));
+        
         return new PagedResult<ProductDto>
         {
             Items = items,

@@ -24,7 +24,7 @@ public class AppDbContextFactory
         var connectionString = configuration.GetConnectionString("DefaultConnection");
 
         var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
-        optionsBuilder.UseNpgsql(connectionString);
+        optionsBuilder.UseNpgsql(connectionString).UseSnakeCaseNamingConvention();
 
         return new AppDbContext(optionsBuilder.Options);
     }

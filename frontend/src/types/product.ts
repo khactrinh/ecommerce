@@ -3,6 +3,7 @@ export interface Product {
   name: string;
   price: number;
   stock: number;
+  imageUrl: string;
 }
 
 export interface PagedResult<T> {

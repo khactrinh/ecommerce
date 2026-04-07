@@ -2,6 +2,7 @@ using System.Reflection;
 using Ecommerce.Application;
 using Ecommerce.Infrastructure;
 using Ecommerce.Infrastructure.Persistence;
+using Ecommerce.Infrastructure.Persistence.Dapper;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -34,16 +35,19 @@ builder.Services.AddApplication();
 // Controllers
 builder.Services.AddControllers();
 
-
-
 var app = builder.Build();
+
+DapperConfig.Configure();
 
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-    await context.Database.MigrateAsync();
-    await DataSeeder.SeedAsync(context);
+    if (app.Environment.IsDevelopment())
+    {
+        await context.Database.MigrateAsync();
+        await DataSeeder.SeedAsync(context);
+    }
 }
 
 // Configure the HTTP request pipeline.
