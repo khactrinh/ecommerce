@@ -19,8 +19,7 @@
   }
 }
 
+/* subtle ecommerce feel */
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: #f5f5f5;
 }

@@ -10,5 +10,6 @@ export function useProducts(page = 1, pageSize = 12) {
 
     placeholderData: (prev) => prev, // 👈 thay cho keepPreviousData
     staleTime: 1000 * 60,
+    retry: false,
   });
 }

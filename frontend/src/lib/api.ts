@@ -29,7 +29,7 @@ import { HttpError } from "./httpError";
 import { getAccessToken } from "./auth";
 import { ApiError } from "@/types/api";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:5204";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:5001";
 
 type FetchOptions = RequestInit & {
   timeout?: number;
@@ -45,10 +45,12 @@ export async function fetcher<T>(
   url: string,
   options: FetchOptions = {},
 ): Promise<T> {
-  const { timeout = 5000, retry = 1, headers, ...rest } = options;
+  const { timeout = 5000, retry = 0, headers, ...rest } = options;
 
   const controller = new AbortController();
   const id = setTimeout(() => controller.abort(), timeout);
+
+  console.log("Fetching:", url);
 
   const token = getAccessToken();
 
@@ -92,11 +94,7 @@ export async function fetcher<T>(
       throw new HttpError(408, "Request timeout");
     }
 
-    // ✅ retry (chỉ retry nếu không phải lỗi client 4xx)
-    if (retry > 0 && err instanceof HttpError && err.status >= 500) {
-      console.warn(`Retrying... (${retry})`);
-      return fetcher<T>(url, { ...options, retry: retry - 1 });
-    }
+    console.error("Fetch error:", err);
 
     throw err;
   } finally {

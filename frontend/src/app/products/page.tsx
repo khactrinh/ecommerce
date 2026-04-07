@@ -2,13 +2,11 @@
 
 import { useProducts } from "@/hooks/useProducts";
 import ProductGrid from "@/components/product/product-grid";
+import { useSearchParams } from "next/navigation";
 
-export default function ProductsPage({
-  searchParams,
-}: {
-  searchParams: { page?: string };
-}) {
-  const page = Number(searchParams.page || 1);
+export default function ProductsPage() {
+  const searchParams = useSearchParams();
+  const page = Number(searchParams.get("page") || 1);
 
   const { data, isLoading } = useProducts(page, 12);
 
