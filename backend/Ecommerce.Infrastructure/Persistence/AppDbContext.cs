@@ -1,4 +1,5 @@
 using Ecommerce.Domain.Cart;
+using Ecommerce.Domain.Identity;
 
 namespace Ecommerce.Infrastructure.Persistence;
 
@@ -21,6 +22,11 @@ public class AppDbContext : DbContext
     public DbSet<Order> Orders { get; set; }
     public DbSet<OrderItem> OrderItems { get; set; }
 
+    public DbSet<User> Users => Set<User>();
+    public DbSet<Role> Roles => Set<Role>();
+    public DbSet<UserRole> UserRoles => Set<UserRole>();
+    public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
+    
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         //modelBuilder.UseSnakeCaseNamingConvention();

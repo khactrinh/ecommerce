@@ -1,12 +1,17 @@
 services:
   postgres:
     image: postgres:15
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d ecommerce"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     environment:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: admin
       POSTGRES_DB: ecommerce
     ports:
-      - "5433:5432"
+      - "5434:5432"
 
   redis:
     image: redis:7
@@ -16,8 +21,12 @@ services:
     build:
       context: .
       dockerfile: Ecommerce.Api/Dockerfile
+    environment:
+      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=ecommerce;Username=admin;Password=admin
     ports:
       - "5001:8080"
     depends_on:
-      - postgres
-      - redis
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started

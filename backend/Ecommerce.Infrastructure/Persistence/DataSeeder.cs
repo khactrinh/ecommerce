@@ -1,4 +1,5 @@
 using Ecommerce.Domain.Entities;
+using Ecommerce.Domain.Identity;
 
 namespace Ecommerce.Infrastructure.Persistence;
 
@@ -6,24 +7,58 @@ public static class DataSeeder
 {
     public static async Task SeedAsync(AppDbContext context)
     {
-        if (context.Products.Any())
-            return;
-
-        var products = new List<Product>
+        // =========================
+        // 🔥 Seed Roles
+        // =========================
+        if (!context.Roles.Any())
         {
-            new Product("iPhone 15", 25000000, 10, "https://picsum.photos/300/300?random=1"),
-            new Product("Samsung Galaxy S23", 20000000, 15, "https://picsum.photos/300/300?random=1"),
-            new Product("MacBook Pro M3", 45000000, 5, "https://picsum.photos/300/300?random=1"),
-            new Product("Dell XPS 13", 35000000, 7, "https://picsum.photos/300/300?random=1"),
-            new Product("iPad Pro", 22000000, 12, "https://picsum.photos/300/300?random=1"),
-            new Product("AirPods Pro", 6000000, 20, "https://picsum.photos/300/300?random=1"),
-            new Product("Logitech MX Master 3", 2500000, 25, "https://picsum.photos/300/300?random=1"),
-            new Product("Mechanical Keyboard", 3000000, 30, "https://picsum.photos/300/300?random=1"),
-            new Product("Gaming Monitor", 8000000, 8, "https://picsum.photos/300/300?random=1"),
-            new Product("Sony WH-1000XM5", 9000000, 9, "https://picsum.photos/300/300?random=1")
-        };
+            var roles = new List<Role>
+            {
+                new Role("Admin"),
+                new Role("Customer")
+            };
 
-        context.Products.AddRange(products);
-        await context.SaveChangesAsync();
+            context.Roles.AddRange(roles);
+            await context.SaveChangesAsync();
+        }
+
+        // =========================
+        // 🔥 Seed Admin User
+        // =========================
+        if (!context.Users.Any(x => x.Email == "admin@gmail.com"))
+        {
+            var adminRole = context.Roles.First(x => x.Name == "Admin");
+
+            var user = User.Create(
+                "admin@gmail.com",
+                BCrypt.Net.BCrypt.HashPassword("123456")
+            );
+
+            user.AddRole(adminRole.Id);
+
+            context.Users.Add(user);
+            await context.SaveChangesAsync();
+        }
+
+        // =========================
+        // 🔥 Seed Products
+        // =========================
+        if (!context.Products.Any())
+        {
+            var products = new List<Product>();
+
+            for (int i = 1; i <= 10; i++)
+            {
+                products.Add(new Product(
+                    $"Product {i}",
+                    1000000 * i,
+                    10 + i,
+                    $"https://picsum.photos/300/300?random={i}"
+                ));
+            }
+
+            context.Products.AddRange(products);
+            await context.SaveChangesAsync();
+        }
     }
 }

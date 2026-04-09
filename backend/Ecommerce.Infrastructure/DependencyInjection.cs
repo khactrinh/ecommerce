@@ -5,12 +5,15 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Ecommerce.Application.Common.Interfaces;
+using Ecommerce.Application.Common.Models;
 using Ecommerce.Application.Interfaces;
 using Ecommerce.Infrastructure.Data;
+using Ecommerce.Infrastructure.Identity;
 using Ecommerce.Infrastructure.Persistence;
 using Ecommerce.Infrastructure.Persistence.Repositories;
 using Ecommerce.Infrastructure.ReadServices;
 using Npgsql;
+using StackExchange.Redis;
 
 namespace Ecommerce.Infrastructure;
 
@@ -59,6 +62,29 @@ public static class DependencyInjection
 
         // 🧱 Write side (EF Core)
         services.AddScoped<IProductRepository, ProductRepository>();
+        
+        // =============================
+        // 🔐 JWT CONFIG (BEST PRACTICE)
+        // =============================
+        services.AddOptions<JwtSettings>()
+            .Bind(configuration.GetSection("Jwt"))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
+        services.AddScoped<IJwtService, JwtService>();
+        
+        services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+        
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+        services.AddSingleton<IConnectionMultiplexer>(sp =>
+        {
+            var config = configuration.GetConnectionString("Redis");
+            return ConnectionMultiplexer.Connect(config);
+        });
+
+        services.AddScoped<ITokenBlacklistService, RedisTokenBlacklistService>();
         
         return services;
     }
