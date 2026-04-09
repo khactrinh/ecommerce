@@ -1,8 +1,6 @@
-using System.Reflection;
 using System.Text;
 using Ecommerce.Api.Middleware;
 using Ecommerce.Application;
-using Ecommerce.Application.Common.Interfaces;
 using Ecommerce.Application.Common.Models;
 using Ecommerce.Infrastructure;
 using Ecommerce.Infrastructure.Persistence;
@@ -10,15 +8,36 @@ using Ecommerce.Infrastructure.Persistence.Dapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    // 🔐 Define Bearer
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Description = "Chỉ cần paste nguyên chuỗi Token vào đây (Swagger sẽ tự thêm chữ Bearer)",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT"
+    });
+
+    // Cú pháp chuẩn .NET 10: Phải truyền 'document' vào Reference
+    options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecuritySchemeReference("Bearer", document),
+            new List<string>()
+        }
+    });
+});
 
 builder.Services.AddInfrastructure(builder.Configuration);
 
@@ -38,24 +57,59 @@ builder.Services.Configure<JwtSettings>(
 
 
 
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+// builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+//     .AddJwtBearer(options =>
+//     {
+//         var jwt = builder.Configuration.GetSection("Jwt").Get<JwtSettings>();
+//
+//         options.TokenValidationParameters = new TokenValidationParameters
+//         {
+//             ValidateIssuer = true,
+//             ValidIssuer = jwt.Issuer,
+//
+//             ValidateAudience = true,
+//             ValidAudience = jwt.Audience,
+//
+//             ValidateIssuerSigningKey = true,
+//             IssuerSigningKey = new SymmetricSecurityKey(
+//                 Encoding.UTF8.GetBytes(jwt.Secret)),
+//
+//             ValidateLifetime = true
+//         };
+//     });
+
+builder.Services.AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
     .AddJwtBearer(options =>
     {
-        var jwt = builder.Configuration.GetSection("Jwt").Get<JwtSettings>();
-
         options.TokenValidationParameters = new TokenValidationParameters
         {
-            ValidateIssuer = true,
-            ValidIssuer = jwt.Issuer,
-
-            ValidateAudience = true,
-            ValidAudience = jwt.Audience,
-
+            ValidateIssuer = false,   // 🔥 tạm tắt để test
+            ValidateAudience = false,
+            ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(jwt.Secret)),
 
-            ValidateLifetime = true
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes("dU5WmQnyrfWNn848u1nVy+KZyJtasjAywhEf+5HfUV4="))
+        };
+
+        // 🔥 DEBUG
+        options.Events = new JwtBearerEvents
+        {
+            OnAuthenticationFailed = ctx =>
+            {
+                Console.WriteLine("AUTH FAILED: " + ctx.Exception.Message);
+                return Task.CompletedTask;
+            },
+            OnTokenValidated = ctx =>
+            {
+                Console.WriteLine("TOKEN OK");
+                return Task.CompletedTask;
+            }
         };
     });
 
@@ -97,14 +151,9 @@ using (var scope = app.Services.CreateScope())
     //}
 }
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-}
 
 app.UseAuthentication();
-app.UseMiddleware<JwtBlacklistMiddleware>();
+//app.UseMiddleware<JwtBlacklistMiddleware>();
 app.UseAuthorization();
 
 //app.UseHttpsRedirection();

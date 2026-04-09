@@ -1,12 +1,14 @@
 using Ecommerce.Application.Catalog.GetProductById;
 using Ecommerce.Application.Catalog.GetProducts;
 using Ecommerce.Application.Catalog.Products.Commands;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Ecommerce.Api.Controllers;
 
 using Microsoft.AspNetCore.Mvc;
 using MediatR;
 
+[Authorize]
 [ApiController]
 [Route("api/[controller]")]
 public class ProductController : ControllerBase
