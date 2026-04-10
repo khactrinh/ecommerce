@@ -40,7 +40,7 @@ public class AuthController : ControllerBase
         var jwt = HttpContext.Request.Headers["Authorization"]
             .FirstOrDefault()?.Replace("Bearer ", "");
         var ip = HttpContext.Connection.RemoteIpAddress?.ToString();
-        var command = new LogoutCommand(refreshToken, jwt, ip);
+        var command = new LogoutCommand(refreshToken, ip, jwt);
 
         await _mediator.Send(command);
         return Ok();

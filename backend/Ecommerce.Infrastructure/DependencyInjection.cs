@@ -84,7 +84,6 @@ public static class DependencyInjection
             return ConnectionMultiplexer.Connect(config);
         });
 
-        services.AddScoped<ITokenBlacklistService, RedisTokenBlacklistService>();
         
         return services;
     }

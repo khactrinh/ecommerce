@@ -29,11 +29,18 @@ public class RefreshTokenHandler : IRequestHandler<RefreshTokenCommand, LoginRes
     {
         var token = await _repo.GetByTokenAsync(request.Token);
 
-        if (token == null || token.IsRevoked || token.ExpiryDate < DateTime.UtcNow)
-            throw new UnauthorizedAccessException("Token is invalid or expired.");
-        
+        if (token == null)
+            throw new UnauthorizedAccessException("Invalid token");
+
         if (token.IsRevoked)
-            throw new UnauthorizedAccessException("Token revoked");
+        {
+            await _repo.RevokeFamilyAsync(token.FamilyId, request.IpAddress);
+            await _uow.SaveChangesAsync(ct);
+            
+            throw new UnauthorizedAccessException("Token reuse detected");
+        }
+
+        
 
         var user = await _userRepo.GetByIdAsync(token.UserId);
         
@@ -41,6 +48,8 @@ public class RefreshTokenHandler : IRequestHandler<RefreshTokenCommand, LoginRes
             throw new UnauthorizedAccessException("User not found.");
 
         token.IsRevoked = true;
+        token.RevokedAt = DateTime.UtcNow;
+        token.RevokedByIp = request.IpAddress;
 
         var newRefresh = _jwtService.GenerateRefreshToken();
 
@@ -49,7 +58,9 @@ public class RefreshTokenHandler : IRequestHandler<RefreshTokenCommand, LoginRes
             UserId = user.Id,
             Token = newRefresh,
             ExpiryDate = DateTime.UtcNow.AddDays(7),
-            CreatedByIp = request.IpAddress
+            CreatedByIp = request.IpAddress,
+            ParentTokenId = token.Id,
+            FamilyId = token.FamilyId
         });
 
         await _uow.SaveChangesAsync(ct);

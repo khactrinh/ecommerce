@@ -39,7 +39,8 @@ public class LoginHandler : IRequestHandler<LoginCommand, LoginResponse>
             UserId = user.Id,
             Token = refreshToken,
             ExpiryDate = DateTime.UtcNow.AddDays(7),
-            CreatedByIp = request.IpAddress
+            CreatedByIp = request.IpAddress,
+            FamilyId = Guid.NewGuid()
         });
 
         await _uow.SaveChangesAsync(ct);

@@ -13,4 +13,8 @@ public class RefreshToken
     public string CreatedByIp { get; set; }
     public DateTime? RevokedAt { get; set; }
     public string? RevokedByIp { get; set; }
+    
+    // 🔥 rotation
+    public Guid? ParentTokenId { get; set; }
+    public Guid FamilyId { get; set; }
 }

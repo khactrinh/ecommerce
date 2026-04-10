@@ -1,5 +1,4 @@
 using System.Text;
-using Ecommerce.Api.Middleware;
 using Ecommerce.Application;
 using Ecommerce.Application.Common.Models;
 using Ecommerce.Infrastructure;
@@ -158,7 +157,6 @@ using (var scope = app.Services.CreateScope())
 
 
 app.UseAuthentication();
-//app.UseMiddleware<JwtBlacklistMiddleware>();
 app.UseAuthorization();
 
 //app.UseHttpsRedirection();

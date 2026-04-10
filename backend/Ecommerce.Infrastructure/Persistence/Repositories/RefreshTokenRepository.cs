@@ -30,4 +30,16 @@ public class RefreshTokenRepository : IRefreshTokenRepository
             .Where(x => x.UserId == userId && !x.IsRevoked)
             .ToListAsync();
     }
+    public async Task RevokeFamilyAsync(Guid familyId, string ipAddress)
+    {
+        var tokens = await _context.RefreshTokens
+            .Where(x => x.FamilyId == familyId && x.RevokedAt == null)
+            .ToListAsync();
+
+        foreach (var t in tokens)
+        {
+            t.RevokedAt = DateTime.UtcNow;
+            t.RevokedByIp = ipAddress;
+        }
+    }
 }
