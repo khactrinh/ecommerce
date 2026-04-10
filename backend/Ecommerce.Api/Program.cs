@@ -78,6 +78,7 @@ builder.Services.Configure<JwtSettings>(
 //         };
 //     });
 
+var jwt = builder.Configuration.GetSection("Jwt").Get<JwtSettings>();
 builder.Services.AddAuthentication(options =>
     {
         options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -88,13 +89,17 @@ builder.Services.AddAuthentication(options =>
     {
         options.TokenValidationParameters = new TokenValidationParameters
         {
-            ValidateIssuer = false,   // 🔥 tạm tắt để test
-            ValidateAudience = false,
+            ValidateIssuer = true,
+            ValidIssuer = jwt.Issuer,
+
+            ValidateAudience = true,
+            ValidAudience = jwt.Audience,
+
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
 
             IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes("dU5WmQnyrfWNn848u1nVy+KZyJtasjAywhEf+5HfUV4="))
+                Encoding.UTF8.GetBytes(jwt.Secret))
         };
 
         // 🔥 DEBUG
