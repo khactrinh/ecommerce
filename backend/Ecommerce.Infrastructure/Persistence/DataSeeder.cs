@@ -53,7 +53,8 @@ public static class DataSeeder
                     $"Product {i}",
                     1000000 * i,
                     10 + i,
-                    $"https://picsum.photos/300/300?random={i}"
+                    $"https://picsum.photos/300/300?random={i}",
+                    Guid.NewGuid() //TODO
                 ));
             }
 

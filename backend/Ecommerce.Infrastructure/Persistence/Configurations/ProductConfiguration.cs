@@ -21,5 +21,9 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
         builder.Property(x => x.Stock);
 
         builder.Property(x => x.ImageUrl);
+        
+        builder.HasOne(x => x.Category)
+            .WithMany(x => x.Products)
+            .HasForeignKey(x => x.CategoryId);
     }
 }

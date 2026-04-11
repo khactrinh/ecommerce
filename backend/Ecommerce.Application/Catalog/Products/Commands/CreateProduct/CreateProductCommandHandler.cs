@@ -1,3 +1,5 @@
+using Ecommerce.Application.Catalog.Products.Commands.CreateProduct;
+
 namespace Ecommerce.Application.Catalog.Products.Commands;
 
 using MediatR;
@@ -15,7 +17,7 @@ public class CreateProductHandler : IRequestHandler<CreateProductCommand, Guid>
 
     public async Task<Guid> Handle(CreateProductCommand request, CancellationToken cancellationToken)
     {
-        var product = new Product(request.Name, request.Price, request.Stock, request.ImageUrl);
+        var product = new Product(request.Name, request.Price, request.Stock, request.ImageUrl, request.CategoryId);
 
         await _repo.AddAsync(product);
 

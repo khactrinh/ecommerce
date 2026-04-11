@@ -1,6 +1,8 @@
 using System.Data;
 using Ecommerce.Application.Cart.Interfaces;
 using Ecommerce.Application.Catalog.GetProducts;
+using Ecommerce.Application.Catalog.Products.Queries.GetProductById;
+using Ecommerce.Application.Catalog.Products.Queries.GetProducts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,7 +13,8 @@ using Ecommerce.Infrastructure.Data;
 using Ecommerce.Infrastructure.Identity;
 using Ecommerce.Infrastructure.Persistence;
 using Ecommerce.Infrastructure.Persistence.Repositories;
-using Ecommerce.Infrastructure.ReadServices;
+using Ecommerce.Infrastructure.ReadModels.Products;
+using Ecommerce.Infrastructure.Services;
 using Npgsql;
 using StackExchange.Redis;
 
@@ -31,6 +34,9 @@ public static class DependencyInjection
                 configuration.GetConnectionString("DefaultConnection")
             ).UseSnakeCaseNamingConvention()
         );
+        
+        services.AddScoped<IApplicationDbContext>(sp =>
+            sp.GetRequiredService<AppDbContext>());
         
         // =============================
         // 🔥 Repositories (WRITE)
@@ -57,7 +63,9 @@ public static class DependencyInjection
         // =============================
         // 🔥 Read Services (CQRS)
         // =============================
-        services.AddScoped<IProductReadService, ProductReadService>();
+        
+        services.AddScoped<IGetProductByIdQueryService, GetProductByIdQueryService>();
+        services.AddScoped<IGetProductsQueryService, GetProductsQueryService>();
         
 
         // 🧱 Write side (EF Core)
@@ -84,6 +92,9 @@ public static class DependencyInjection
             return ConnectionMultiplexer.Connect(config);
         });
 
+        services.AddScoped<IEmailService, EmailService>();
+        
+        //// services.AddSingleton<IMessageBus, RabbitMqBus>();
         
         return services;
     }
