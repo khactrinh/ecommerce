@@ -18,16 +18,31 @@ public class ValidationBehavior<TRequest, TResponse>
         RequestHandlerDelegate<TResponse> next,
         CancellationToken cancellationToken)
     {
+        if (!_validators.Any())
+            return await next();
+
         var context = new ValidationContext<TRequest>(request);
 
-        var failures = _validators
-            .Select(v => v.Validate(context))
+        var validationResults = await Task.WhenAll(
+            _validators.Select(v => v.ValidateAsync(context, cancellationToken))
+        );
+
+        var failures = validationResults
             .SelectMany(x => x.Errors)
             .Where(x => x != null)
             .ToList();
 
         if (failures.Any())
-            throw new Exception("Validation failed");
+        {
+            var errors = failures
+                .GroupBy(x => x.PropertyName)
+                .ToDictionary(
+                    g => g.Key,
+                    g => g.Select(x => x.ErrorMessage).ToArray()
+                );
+
+            throw new ValidationException("Validation failed", failures);
+        }
 
         return await next();
     }

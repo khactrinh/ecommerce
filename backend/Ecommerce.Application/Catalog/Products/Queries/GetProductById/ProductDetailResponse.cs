@@ -1,6 +1,6 @@
 namespace Ecommerce.Application.Catalog.Products.Queries.GetProductById;
 
-public record GetProductByIdResponse(
+public record ProductDetailResponse(
     // Guid Id,
     // string Name,
     // decimal Price,
@@ -11,5 +11,7 @@ public record GetProductByIdResponse(
     Guid Id,
     string Name,
     decimal Price,
-    string ImageUrl
+    int Stock,
+    string ImageUrl,
+    Guid CategoryId
 );

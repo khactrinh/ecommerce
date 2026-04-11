@@ -1,39 +1,37 @@
-using Ecommerce.Application.Catalog.Products.Queries.GetProducts;
-using MediatR;
-using Ecommerce.Application.Common.Extensions;
 using Ecommerce.Shared.Pagination;
+using MediatR;
 
-namespace Ecommerce.Application.Catalog.GetProducts;
+namespace Ecommerce.Application.Catalog.Products.Queries.GetProducts;
 
-ublic class GetProductsHandler 
-    : IRequestHandler<GetProductsQuery, PagedResult<ProductResponse>>
+public class GetProductsQueryHandler 
+    : IRequestHandler<GetProductsQuery, PagedResult<ProductListItemResponse>>
 {
-    private readonly IProductReadService _readService;
+    private readonly IGetProductsQueryService _queryService;
 
-    public GetProductsHandler(IProductReadService readService)
+
+    public GetProductsQueryHandler(IGetProductsQueryService queryService)
     {
-        _readService = readService;
+        _queryService = queryService;
     }
 
-    public async Task<PagedResult<ProductResponse>> Handle(
+    public async Task<PagedResult<ProductListItemResponse>> Handle(
         GetProductsQuery request,
         CancellationToken cancellationToken)
     {
-        var filter = request.Filter;
+        var (items, total) = await _queryService.Execute(request.Filter);
 
-        var (items, total) = await _readService.GetProductsAsync(filter);
-
-        var responseItems = items.Select(x => new ProductResponse(
+        var result = items.Select(x => new ProductListItemResponse(
             x.Id,
             x.Name,
-            x.Price
+            x.Price,
+            x.ImageUrl
         )).ToList();
 
-        return PagedResult<ProductResponse>.Create(
-            responseItems,
+        return PagedResult<ProductListItemResponse>.Create(
+            result,
             total,
-            filter.Page,
-            filter.PageSize
+            request.Filter.Page,
+            request.Filter.PageSize
         );
     }
 }

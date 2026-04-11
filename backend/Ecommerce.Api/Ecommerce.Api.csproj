@@ -16,16 +16,13 @@
   <ItemGroup>
     <ProjectReference Include="..\Ecommerce.Application\Ecommerce.Application.csproj" />
     <ProjectReference Include="..\Ecommerce.Infrastructure\Ecommerce.Infrastructure.csproj" />
+    <ProjectReference Include="..\Ecommerce.Shared\Ecommerce.Shared.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <Content Include="..\.dockerignore">
       <Link>.dockerignore</Link>
     </Content>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Middleware\" />
   </ItemGroup>
 
 </Project>

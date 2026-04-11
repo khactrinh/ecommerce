@@ -1,6 +1,6 @@
 namespace Ecommerce.Application.Common.Interfaces;
 
-public class IEmailService
+public interface IEmailService
 {
-    
+    Task SendAsync(string to, string subject, string body);
 }

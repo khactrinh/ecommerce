@@ -1,6 +1,5 @@
+using MediatR;
+
 namespace Ecommerce.Application.Catalog.Products.Commands.DeleteProduct;
 
-public class DeleteProductCommand
-{
-    
-}
+public record DeleteProductCommand(Guid Id) : IRequest;

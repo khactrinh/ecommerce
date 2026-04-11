@@ -1,6 +1,6 @@
 namespace Ecommerce.Application.Catalog.GetProductById;
 
-public class ProductListItemDto
+public class ProductDetailDto
 {
     public Guid Id { get; set; }
     public string Name { get; set; }
@@ -8,4 +8,5 @@ public class ProductListItemDto
     public int Stock { get; set; }
     public string ImageUrl { get; set; }
     public string Description { get; set; }
+    public Guid CategoryId  { get; set; }
 }

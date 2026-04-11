@@ -1,7 +1,9 @@
 using System.Text;
+using Ecommerce.Api.Middleware;
 using Ecommerce.Application;
 using Ecommerce.Application.Common.Models;
 using Ecommerce.Infrastructure;
+//using Ecommerce.Infrastructure.BackgroundJobs;
 using Ecommerce.Infrastructure.Persistence;
 using Ecommerce.Infrastructure.Persistence.Dapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -40,6 +42,8 @@ builder.Services.AddSwaggerGen(options =>
 
 builder.Services.AddInfrastructure(builder.Configuration);
 
+//builder.Services.AddHostedService<OutboxProcessor>();
+
 // builder.Services.AddCors(options =>
 // {
 //     options.AddPolicy("AllowFrontend",
@@ -54,28 +58,6 @@ builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.Configure<JwtSettings>(
     builder.Configuration.GetSection("Jwt"));
 
-
-
-// builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-//     .AddJwtBearer(options =>
-//     {
-//         var jwt = builder.Configuration.GetSection("Jwt").Get<JwtSettings>();
-//
-//         options.TokenValidationParameters = new TokenValidationParameters
-//         {
-//             ValidateIssuer = true,
-//             ValidIssuer = jwt.Issuer,
-//
-//             ValidateAudience = true,
-//             ValidAudience = jwt.Audience,
-//
-//             ValidateIssuerSigningKey = true,
-//             IssuerSigningKey = new SymmetricSecurityKey(
-//                 Encoding.UTF8.GetBytes(jwt.Secret)),
-//
-//             ValidateLifetime = true
-//         };
-//     });
 
 var jwt = builder.Configuration.GetSection("Jwt").Get<JwtSettings>();
 builder.Services.AddAuthentication(options =>
@@ -155,6 +137,7 @@ using (var scope = app.Services.CreateScope())
     //}
 }
 
+app.UseMiddleware<ExceptionMiddleware>();
 
 app.UseAuthentication();
 app.UseAuthorization();

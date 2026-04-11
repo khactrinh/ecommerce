@@ -1,6 +1,11 @@
 using Ecommerce.Application.Catalog.GetProductById;
 using Ecommerce.Application.Catalog.GetProducts;
 using Ecommerce.Application.Catalog.Products.Commands;
+using Ecommerce.Application.Catalog.Products.Commands.CreateProduct;
+using Ecommerce.Application.Catalog.Products.Queries.GetProductById;
+using Ecommerce.Application.Catalog.Products.Queries.GetProducts;
+using Ecommerce.Shared.Pagination;
+using Ecommerce.Shared.Responses;
 using Microsoft.AspNetCore.Authorization;
 
 namespace Ecommerce.Api.Controllers;
@@ -24,29 +29,26 @@ public class ProductController : ControllerBase
     public async Task<IActionResult> Create(CreateProductCommand command)
     {
         var id = await _mediator.Send(command);
-        return Ok(id);
+
+        return Ok(ApiResponse<Guid>.SuccessResponse(id));
     }
     
     [HttpGet]
-    public async Task<IActionResult> Get(
-        [FromQuery] int page = 1,
-        [FromQuery] int pageSize = 12,
-        [FromQuery] string? search = null)
+    public async Task<IActionResult> Get([FromQuery] ProductFilter filter)
     {
-        var result = await _mediator.Send(
-            new GetProductsQuery(page, pageSize, search));
+        var result = await _mediator.Send(new GetProductsQuery(filter));
 
-        return Ok(result);
+        return Ok(ApiResponse<PagedResult<ProductListItemResponse>>
+            .SuccessResponse(result));
     }
+
     
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(Guid id)
     {
         var result = await _mediator.Send(new GetProductByIdQuery(id));
 
-        if (result == null)
-            return NotFound();
-
-        return Ok(result);
+        return Ok(ApiResponse<ProductDetailResponse>
+            .SuccessResponse(result));
     }
 }

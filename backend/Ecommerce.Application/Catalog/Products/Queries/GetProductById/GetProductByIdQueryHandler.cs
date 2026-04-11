@@ -1,37 +1,74 @@
-using Dapper;
+// using Dapper;
+// using Ecommerce.Application.Catalog.Products.Queries.GetProductById;
+// using MediatR;
+// using Ecommerce.Application.Common.Interfaces;
+//
+// namespace Ecommerce.Application.Catalog.GetProductById;
+//
+// public class GetProductByIdQueryHandler 
+//     : IRequestHandler<GetProductByIdQuery, ProductDetailDto?>
+// {
+//     private readonly IDbConnectionFactory _connectionFactory;
+//
+//     public GetProductByIdQueryHandler(IDbConnectionFactory connectionFactory)
+//     {
+//         _connectionFactory = connectionFactory;
+//     }
+//
+//     public async Task<ProductDetailDto?> Handle(
+//         GetProductByIdQuery request,
+//         CancellationToken cancellationToken)
+//     {
+//         using var connection = _connectionFactory.CreateConnection();
+//
+//         var sql = @"
+//             SELECT id, name, price, stock, image_url
+//             FROM products
+//             WHERE id = @Id
+//             LIMIT 1;
+//         ";
+//
+//         var product = await connection.QueryFirstOrDefaultAsync<ProductDetailDto>(
+//             sql,
+//             new { request.Id }
+//         );
+//
+//         return product;
+//     }
+// }
+
+using Ecommerce.Domain.Exceptions;
 using MediatR;
-using Ecommerce.Application.Common.Interfaces;
 
-namespace Ecommerce.Application.Catalog.GetProductById;
+namespace Ecommerce.Application.Catalog.Products.Queries.GetProductById;
 
-public class GetProductByIdHandler 
-    : IRequestHandler<GetProductByIdQuery, ProductDto?>
+public class GetProductByIdQueryHandler 
+    : IRequestHandler<GetProductByIdQuery, ProductDetailResponse>
 {
-    private readonly IDbConnectionFactory _connectionFactory;
+    
+    private readonly IGetProductByIdQueryService _queryService;
 
-    public GetProductByIdHandler(IDbConnectionFactory connectionFactory)
+    public GetProductByIdQueryHandler(IGetProductByIdQueryService queryService)
     {
-        _connectionFactory = connectionFactory;
+        _queryService = queryService;
     }
 
-    public async Task<ProductDto?> Handle(
+    public async Task<ProductDetailResponse> Handle(
         GetProductByIdQuery request,
         CancellationToken cancellationToken)
     {
-        using var connection = _connectionFactory.CreateConnection();
+        var product = await _queryService.Execute(request.Id);
 
-        var sql = @"
-            SELECT id, name, price, stock, image_url
-            FROM products
-            WHERE id = @Id
-            LIMIT 1;
-        ";
+        if (product == null)
+            throw new ProductNotFoundException(request.Id);
 
-        var product = await connection.QueryFirstOrDefaultAsync<ProductDto>(
-            sql,
-            new { request.Id }
+        return new ProductDetailResponse(
+            product.Id,
+            product.Name,
+            product.Price,
+            product.Stock,
+            product.ImageUrl,
+            product.CategoryId
         );
-
-        return product;
     }
 }

@@ -1,6 +1,6 @@
 namespace Ecommerce.Application.Interfaces;
 
-public class IMessageBus
+public interface IMessageBus
 {
-    
+    Task PublishAsync(string topic, object message);
 }

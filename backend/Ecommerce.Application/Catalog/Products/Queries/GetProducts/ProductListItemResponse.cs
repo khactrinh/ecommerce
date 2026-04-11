@@ -1,6 +1,6 @@
 namespace Ecommerce.Application.Catalog.Products.Queries.GetProducts;
 
-public record GetProductsResponse(
+public record ProductListItemResponse(
     Guid Id,
     string Name,
     decimal Price,

@@ -1,6 +1,6 @@
 using Ecommerce.Shared.Pagination;
 
-namespace Ecommerce.Application.Catalog.Products.Queries;
+namespace Ecommerce.Application.Catalog.Products.Queries.GetProducts;
 
 public class ProductFilter : PaginationParams
 {

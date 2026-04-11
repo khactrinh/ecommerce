@@ -1,4 +1,6 @@
 using Ecommerce.Application.Catalog.Products.Commands.CreateProduct;
+using Ecommerce.Domain.Exceptions;
+using Microsoft.EntityFrameworkCore;
 
 namespace Ecommerce.Application.Catalog.Products.Commands;
 
@@ -6,20 +8,35 @@ using MediatR;
 using Ecommerce.Domain.Entities;
 using Ecommerce.Application.Interfaces;
 
-public class CreateProductHandler : IRequestHandler<CreateProductCommand, Guid>
+public class CreateProductCommandHandler 
+    : IRequestHandler<CreateProductCommand, Guid>
 {
-    private readonly IProductRepository _repo;
+    private readonly IApplicationDbContext _context;
 
-    public CreateProductHandler(IProductRepository repo)
+    public CreateProductCommandHandler(IApplicationDbContext context)
     {
-        _repo = repo;
+        _context = context;
     }
 
-    public async Task<Guid> Handle(CreateProductCommand request, CancellationToken cancellationToken)
+    public async Task<Guid> Handle(
+        CreateProductCommand request,
+        CancellationToken cancellationToken)
     {
-        var product = new Product(request.Name, request.Price, request.Stock, request.ImageUrl, request.CategoryId);
+        var categoryExists = await _context.Categories
+            .AnyAsync(x => x.Id == request.CategoryId, cancellationToken);
 
-        await _repo.AddAsync(product);
+        if (!categoryExists)
+            throw new CategoryNotFoundException(request.CategoryId);
+
+        var product = Product.Create(
+            request.Name,
+            request.Price,
+            request.Stock,
+            request.ImageUrl,
+            request.CategoryId
+        );
+
+        await _context.Products.AddAsync(product, cancellationToken);
 
         return product.Id;
     }
