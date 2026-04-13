@@ -1,3 +1,4 @@
+using Ecommerce.Application.Common.Interfaces;
 using Ecommerce.Application.Interfaces;
 using MediatR;
 
@@ -6,9 +7,9 @@ namespace Ecommerce.Application.Common.Behaviors;
 public class TransactionBehavior<TRequest, TResponse> 
     : IPipelineBehavior<TRequest, TResponse>
 {
-    private readonly IApplicationDbContext _context;
+    private readonly IAppDbContext _context;
 
-    public TransactionBehavior(IApplicationDbContext context)
+    public TransactionBehavior(IAppDbContext context)
     {
         _context = context;
     }

@@ -1,5 +1,4 @@
 using Dapper;
-using Ecommerce.Application.Catalog.GetProductById;
 using Ecommerce.Application.Catalog.Products.Queries.GetProductById;
 using Ecommerce.Application.Common.Interfaces;
 

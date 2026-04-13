@@ -23,7 +23,17 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
         builder.Property(x => x.ImageUrl);
         
         builder.HasOne(x => x.Category)
-            .WithMany(x => x.Products)
-            .HasForeignKey(x => x.CategoryId);
+            .WithMany()
+            .HasForeignKey(x => x.CategoryId)
+            .OnDelete(DeleteBehavior.Restrict);
+        
+        builder.HasIndex(x => x.CategoryId)
+            .HasDatabaseName("idx_products_category");
+
+        builder.HasIndex(x => x.Price)
+            .HasDatabaseName("idx_products_price");
+
+        builder.HasIndex(x => x.Name)
+            .HasDatabaseName("idx_products_name");
     }
 }

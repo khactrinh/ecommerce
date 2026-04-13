@@ -1,9 +1,9 @@
 using Ecommerce.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace Ecommerce.Application.Interfaces;
+namespace Ecommerce.Application.Common.Interfaces;
 
-public interface IApplicationDbContext
+public interface IAppDbContext
 {
     DbSet<Product> Products { get; }
     DbSet<Category> Categories { get; }

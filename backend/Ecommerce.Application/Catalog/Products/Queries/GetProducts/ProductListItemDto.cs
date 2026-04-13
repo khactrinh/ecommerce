@@ -1,4 +1,4 @@
-namespace Ecommerce.Application.Catalog.GetProducts;
+namespace Ecommerce.Application.Catalog.Products.Queries.GetProducts;
 
 public class ProductListItemDto
 {
@@ -8,7 +8,6 @@ public class ProductListItemDto
     public int Stock { get; set; } 
     public string ImageUrl { get; set; }
     
-    public Guid CategoryId { get; set; }
 }
 
 //TODO : public record ProductDetailDto(Guid Id, string Name, decimal Price, Guid CategoryId);

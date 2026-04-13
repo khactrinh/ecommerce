@@ -1,4 +1,4 @@
-namespace Ecommerce.Application.Catalog.GetProductById;
+namespace Ecommerce.Application.Catalog.Products.Queries.GetProductById;
 
 public class ProductDetailDto
 {

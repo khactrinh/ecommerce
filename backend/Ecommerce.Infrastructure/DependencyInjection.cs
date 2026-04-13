@@ -1,18 +1,18 @@
 using System.Data;
 using Ecommerce.Application.Cart.Interfaces;
-using Ecommerce.Application.Catalog.GetProducts;
 using Ecommerce.Application.Catalog.Products.Queries.GetProductById;
-using Ecommerce.Application.Catalog.Products.Queries.GetProducts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Ecommerce.Application.Common.Interfaces;
 using Ecommerce.Application.Common.Models;
 using Ecommerce.Application.Interfaces;
+using Ecommerce.Infrastructure.Caching;
 using Ecommerce.Infrastructure.Data;
 using Ecommerce.Infrastructure.Identity;
 using Ecommerce.Infrastructure.Persistence;
 using Ecommerce.Infrastructure.Persistence.Repositories;
+using Ecommerce.Infrastructure.ReadModels.Categories;
 using Ecommerce.Infrastructure.ReadModels.Products;
 using Ecommerce.Infrastructure.Services;
 using Npgsql;
@@ -35,7 +35,7 @@ public static class DependencyInjection
             ).UseSnakeCaseNamingConvention()
         );
         
-        services.AddScoped<IApplicationDbContext>(sp =>
+        services.AddScoped<IAppDbContext>(sp =>
             sp.GetRequiredService<AppDbContext>());
         
         // =============================
@@ -65,7 +65,7 @@ public static class DependencyInjection
         // =============================
         
         services.AddScoped<IGetProductByIdQueryService, GetProductByIdQueryService>();
-        services.AddScoped<IGetProductsQueryService, GetProductsQueryService>();
+        services.AddScoped<IProductQueryService, ProductQueryService>();
         
 
         // 🧱 Write side (EF Core)
@@ -93,6 +93,9 @@ public static class DependencyInjection
         });
 
         services.AddScoped<IEmailService, EmailService>();
+        
+        services.AddScoped<ICategoryQueryService, CategoryQueryService>();
+        services.AddScoped<ICacheService, RedisCacheService>();
         
         //// services.AddSingleton<IMessageBus, RabbitMqBus>();
         

@@ -1,3 +1,4 @@
+using Ecommerce.Application.Common.Interfaces;
 using Ecommerce.Application.Interfaces;
 using Ecommerce.Domain.Exceptions;
 using MediatR;
@@ -8,9 +9,9 @@ namespace Ecommerce.Application.Catalog.Products.Commands.UpdateProduct;
 public class UpdateProductCommandHandler 
     : IRequestHandler<UpdateProductCommand>
 {
-    private readonly IApplicationDbContext _context;
+    private readonly IAppDbContext _context;
 
-    public UpdateProductCommandHandler(IApplicationDbContext context)
+    public UpdateProductCommandHandler(IAppDbContext context)
     {
         _context = context;
     }

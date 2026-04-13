@@ -37,7 +37,6 @@
 
   <ItemGroup>
     <Folder Include="Persistence\Migrations\" />
-    <Folder Include="ReadModels\" />
   </ItemGroup>
 
   <ItemGroup>

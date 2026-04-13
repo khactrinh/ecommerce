@@ -1,4 +1,5 @@
 using Ecommerce.Application.Catalog.Products.Commands.CreateProduct;
+using Ecommerce.Application.Common.Interfaces;
 using Ecommerce.Domain.Exceptions;
 using Microsoft.EntityFrameworkCore;
 
@@ -6,14 +7,13 @@ namespace Ecommerce.Application.Catalog.Products.Commands;
 
 using MediatR;
 using Ecommerce.Domain.Entities;
-using Ecommerce.Application.Interfaces;
 
 public class CreateProductCommandHandler 
     : IRequestHandler<CreateProductCommand, Guid>
 {
-    private readonly IApplicationDbContext _context;
+    private readonly IAppDbContext _context;
 
-    public CreateProductCommandHandler(IApplicationDbContext context)
+    public CreateProductCommandHandler(IAppDbContext context)
     {
         _context = context;
     }

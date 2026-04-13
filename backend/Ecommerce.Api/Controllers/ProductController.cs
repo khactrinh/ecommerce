@@ -1,4 +1,3 @@
-using Ecommerce.Application.Catalog.GetProductById;
 using Ecommerce.Application.Catalog.GetProducts;
 using Ecommerce.Application.Catalog.Products.Commands;
 using Ecommerce.Application.Catalog.Products.Commands.CreateProduct;

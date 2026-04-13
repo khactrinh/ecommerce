@@ -1,3 +1,4 @@
+using Ecommerce.Application.Common.Interfaces;
 using Ecommerce.Application.Interfaces;
 using Ecommerce.Domain.Cart;
 using Ecommerce.Domain.Common;
@@ -8,7 +9,7 @@ namespace Ecommerce.Infrastructure.Persistence;
 
 using Microsoft.EntityFrameworkCore;
 using Ecommerce.Domain.Entities;
-public class AppDbContext : DbContext, IApplicationDbContext
+public class AppDbContext : DbContext, IAppDbContext
 {
     private readonly IMediator? _mediator;
     

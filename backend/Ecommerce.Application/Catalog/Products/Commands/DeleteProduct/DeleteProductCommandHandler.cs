@@ -1,3 +1,4 @@
+using Ecommerce.Application.Common.Interfaces;
 using Ecommerce.Application.Interfaces;
 using Ecommerce.Domain.Exceptions;
 using MediatR;
@@ -8,9 +9,9 @@ namespace Ecommerce.Application.Catalog.Products.Commands.DeleteProduct;
 public class DeleteProductCommandHandler 
     : IRequestHandler<DeleteProductCommand>
 {
-    private readonly IApplicationDbContext _context;
+    private readonly IAppDbContext _context;
 
-    public DeleteProductCommandHandler(IApplicationDbContext context)
+    public DeleteProductCommandHandler(IAppDbContext context)
     {
         _context = context;
     }
