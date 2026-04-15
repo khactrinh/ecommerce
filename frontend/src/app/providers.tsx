@@ -12,8 +12,15 @@ const queryClient = new QueryClient({
   },
 });
 
+import { AuthProvider } from "@/store/auth-store";
+import { CartProvider } from "@/store/cart-store";
+
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
-    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <CartProvider>{children}</CartProvider>
+      </AuthProvider>
+    </QueryClientProvider>
   );
 }

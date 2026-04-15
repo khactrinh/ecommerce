@@ -37,11 +37,11 @@
 // }
 
 
-using Ecommerce.Application.Catalog.Products.Queries.GetProducts;
 using Ecommerce.Application.Common.Interfaces;
 using Ecommerce.Shared.Pagination;
 using MediatR;
 
+namespace  Ecommerce.Application.Catalog.Products.Queries.GetProducts;
 public class GetProductsHandler 
     : IRequestHandler<GetProductsQuery, PagedResult<ProductListItemResponse>>
 {
@@ -56,20 +56,22 @@ public class GetProductsHandler
         GetProductsQuery request,
         CancellationToken cancellationToken)
     {
-        var (items, total) = await _service.GetProducts(request.Filter);
+        var result = await _service.GetProducts(request.Filter);
 
-        var result = items.Select(x => new ProductListItemResponse
-        (
+        // 🛡️ Defensive (double safety)
+        var items = result?.Items ?? new List<ProductListItemDto>();
+        var total = result?.Total ?? 0;
+
+        var mapped = items.Select(x => new ProductListItemResponse(
             x.Id,
             x.Name,
             x.Price,
             x.ImageUrl,
             x.Stock
-            
         )).ToList();
 
         return PagedResult<ProductListItemResponse>.Create(
-            result,
+            mapped,
             total,
             request.Filter.Page,
             request.Filter.PageSize

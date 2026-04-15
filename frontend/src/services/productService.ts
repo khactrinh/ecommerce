@@ -1,26 +1,14 @@
-import { fetcher } from "@/lib/api";
+import { api } from "@/lib/api";
+import { Product, PaginatedResponse, ApiResponse } from "@/lib/types";
 
-export interface Product {
-  id: string;
-  name: string;
-  price: number;
-  stock: number;
-}
-
-export interface ProductResponse {
-  items: Product[];
-  page: number;
-  pageSize: number;
-  total: number;
-  totalPages: number;
-}
-
-export const getProducts = (page = 1, pageSize = 12) => {
-  return fetcher<ProductResponse>(
-    `/api/Product?page=${page}&pageSize=${pageSize}`,
+export const getProducts = async (page = 1, pageSize = 12) => {
+  const res = await api.get<ApiResponse<PaginatedResponse<Product>>>(
+    `/api/Product?Page=${page}&PageSize=${pageSize}`
   );
+  return res.data;
 };
 
 export async function getProductById(id: string) {
-  return fetcher<Product>(`/api/Product/${id}`);
+  const res = await api.get<ApiResponse<Product>>(`/api/Product/${id}`);
+  return res.data;
 }

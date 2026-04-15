@@ -1,0 +1,9 @@
+<div class="container">
+    <h2>📊 Event Timeline</h2>
+
+    <div *ngFor="let e of events" class="event-card">
+        <div class="type">{{ e.type }}</div>
+        <div class="time">{{ e.occurredOn }}</div>
+        <pre>{{ e.data | json }}</pre>
+    </div>
+</div>

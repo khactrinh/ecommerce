@@ -5,6 +5,7 @@ using Ecommerce.Application.Catalog.Categories.Queries.GetCategoryTree;
 using Ecommerce.Application.Features.Categories.Commands.CreateCategory;
 using Ecommerce.Application.Features.Categories.Queries.GetCategoryById;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Ecommerce.Api.Controllers;
@@ -21,6 +22,7 @@ public class CategoryController : ControllerBase
     }
     
     [HttpGet]
+    [AllowAnonymous]
     public async Task<IActionResult> Get([FromQuery] CategoryFilter filter)
     {
         var result = await _mediator.Send(new GetCategoriesQuery(filter));
@@ -28,6 +30,7 @@ public class CategoryController : ControllerBase
     }
     
     [HttpGet("tree")]
+    [AllowAnonymous]
     public async Task<IActionResult> GetTree()
     {
         var result = await _mediator.Send(new GetCategoryTreeQuery());

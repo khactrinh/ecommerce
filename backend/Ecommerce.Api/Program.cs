@@ -2,10 +2,13 @@ using System.Text;
 using Ecommerce.Api.Middleware;
 using Ecommerce.Application;
 using Ecommerce.Application.Common.Models;
+using Ecommerce.Application.Orders.Sagas;
 using Ecommerce.Infrastructure;
+using Ecommerce.Infrastructure.Messaging;
 //using Ecommerce.Infrastructure.BackgroundJobs;
 using Ecommerce.Infrastructure.Persistence;
 using Ecommerce.Infrastructure.Persistence.Dapper;
+using Ecommerce.Infrastructure.Persistence.Sagas;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -77,6 +80,7 @@ builder.Services.AddAuthentication(options =>
             ValidAudience = jwt.Audience,
 
             ValidateLifetime = true,
+            ClockSkew = TimeSpan.Zero,
             ValidateIssuerSigningKey = true,
 
             IssuerSigningKey = new SymmetricSecurityKey(
@@ -113,6 +117,10 @@ builder.Services.AddCors(options =>
 });
 
 
+builder.Services.AddScoped<IOrderSagaRepository, OrderSagaRepository>();
+builder.Services.AddScoped<OrderSaga>();
+
+
 // MediatR
 //builder.Services.AddMediatR(Assembly.Load("Ecommerce.Application"));
 builder.Services.AddApplication();
@@ -133,17 +141,15 @@ using (var scope = app.Services.CreateScope())
     // if (app.Environment.IsDevelopment())
     // {
         await context.Database.MigrateAsync();
-        await DataSeeder.SeedAsync(context);
     //}
 }
 
 app.UseMiddleware<ExceptionMiddleware>();
 
+app.UseCors("AllowFrontend");
+
 app.UseAuthentication();
 app.UseAuthorization();
-
-//app.UseHttpsRedirection();
-app.UseCors("AllowFrontend");
 
 app.MapControllers();
 

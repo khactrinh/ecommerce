@@ -1,11 +1,13 @@
+using Ecommerce.Domain.Catalog.Products.Events;
 using Ecommerce.Domain.Common;
+using Ecommerce.Domain.Entities;
 using Ecommerce.Domain.Events;
 
-namespace Ecommerce.Domain.Entities;
+namespace Ecommerce.Domain.Catalog.Products;
 
 public class Product : BaseEntity
 {
-    public Guid Id { get; private set; } = Guid.NewGuid();
+    public Guid Id { get; private set; } 
     public string Name { get; private set; } = default!;
     public decimal Price { get; private set; }
     public int Stock { get; private set; }
@@ -18,8 +20,9 @@ public class Product : BaseEntity
 
     private Product() { }
 
-    public Product(string name, decimal price, int stock, string imageUrl, Guid categoryId)
+    private Product(string name, decimal price, int stock, string imageUrl, Guid categoryId)
     {
+        Id = Guid.NewGuid(); // 🔥 FIX
         Name = name;
         Price = price;
         Stock = stock;
@@ -44,17 +47,12 @@ public class Product : BaseEntity
 
         if (stock < 0)
             throw new ArgumentException("Invalid stock");
-        
-        // if (price <= 0)
-        //     throw new ArgumentException("Price must be greater than 0");
-        //
-        // if (stock < 0)
-        //     throw new ArgumentException("Stock cannot be negative");
 
         var product = new Product(name, price, stock, imageUrl, categoryId);
 
-        product.AddDomainEvent(new ProductCreatedEvent(product.Id));
-        
+        product.AddDomainEvent(
+            new ProductCreatedEvent(product.Id, product.Name)
+        );
 
         return product;
     }

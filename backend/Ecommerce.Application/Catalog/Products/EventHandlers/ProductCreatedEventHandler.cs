@@ -1,17 +1,19 @@
+using Ecommerce.Application.Common.Events;
 using Ecommerce.Application.Common.Interfaces;
-using Ecommerce.Domain.Events;
+using Ecommerce.Domain.Catalog.Products.Events;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
 namespace Ecommerce.Application.Catalog.Products.EventHandlers;
 
 public class ProductCreatedEventHandler 
-    : INotificationHandler<ProductCreatedEvent>
+    : INotificationHandler<DomainEventNotification<ProductCreatedEvent>>
 {
     //private readonly IIntegrationEventService _service;
     
     private readonly ILogger<ProductCreatedEventHandler> _logger;
     private readonly IEmailService _emailService;
+    private INotificationHandler<DomainEventNotification<ProductCreatedEvent>> _notificationHandlerImplementation;
 
     public ProductCreatedEventHandler(
         ILogger<ProductCreatedEventHandler> logger,
@@ -22,7 +24,7 @@ public class ProductCreatedEventHandler
     }
 
     public async Task Handle(
-        ProductCreatedEvent notification,
+        DomainEventNotification<ProductCreatedEvent> notification,
         CancellationToken cancellationToken)
     {
         // var integrationEvent = new ProductCreatedIntegrationEvent
@@ -32,16 +34,20 @@ public class ProductCreatedEventHandler
 
         //await _service.AddToOutboxAsync(integrationEvent);
         
-        Console.WriteLine($"🔥 Product created: {notification.ProductId}");
+        var domainEvent = notification.DomainEvent;
+        
+        Console.WriteLine($"🔥 Product created: {domainEvent.ProductId}");
         
         _logger.LogInformation(
             "Product created with Id: {ProductId}",
-            notification.ProductId);
+            domainEvent.ProductId);
         
         // ✅ email (mock)
         await _emailService.SendAsync(
             "admin@shop.com",
             "New product created",
-            $"Product Id: {notification.ProductId}");
+            $"Product Id: {domainEvent.ProductId}");
     }
+
+    
 }

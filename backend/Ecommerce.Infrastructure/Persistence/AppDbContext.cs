@@ -1,6 +1,9 @@
+using System.Text.Json;
+using Ecommerce.Application.Common.Events;
 using Ecommerce.Application.Common.Interfaces;
-using Ecommerce.Application.Interfaces;
+using Ecommerce.Application.Orders.Sagas;
 using Ecommerce.Domain.Cart;
+using Ecommerce.Domain.Catalog.Products;
 using Ecommerce.Domain.Common;
 using Ecommerce.Domain.Identity;
 using MediatR;
@@ -38,6 +41,8 @@ public class AppDbContext : DbContext, IAppDbContext
     public DbSet<Category> Categories => Set<Category>();
     //public DbSet<OutboxMessage> OutboxMessages => Set<OutboxMessage>();
     
+    public DbSet<OrderSagaState> OrderSagas { get; set; }
+    
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         //modelBuilder.UseSnakeCaseNamingConvention();
@@ -59,11 +64,7 @@ public class AppDbContext : DbContext, IAppDbContext
     
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
-        var domainEvents = ChangeTracker
-            .Entries<BaseEntity>()
-            .SelectMany(x => x.Entity.DomainEvents)
-            .ToList();
-
+        
         //TODO: test Outbox
         // var outboxMessages = domainEvents.Select(e => new OutboxMessage
         // {
@@ -74,22 +75,54 @@ public class AppDbContext : DbContext, IAppDbContext
         // }).ToList();
         // OutboxMessages.AddRange(outboxMessages);
         
+        var domainEvents = ChangeTracker
+            .Entries<BaseEntity>()
+            .SelectMany(x => x.Entity.DomainEvents)
+            .ToList();
+        
+        // 🔥 Convert event → OutboxMessage
+        var outboxMessages = domainEvents.Select(e => new OutboxMessage
+        {
+            Id = Guid.NewGuid(),
+            OccurredOn = e.OccurredOn,
+            Type = e.GetType().AssemblyQualifiedName!,
+            Content = JsonSerializer.Serialize(e)
+        }).ToList();
+
+        await Set<OutboxMessage>().AddRangeAsync(outboxMessages, cancellationToken);
         
         var result = await base.SaveChangesAsync(cancellationToken);
 
         if (_mediator != null) // 👈 fix null
         {
-            foreach (var domainEvent in domainEvents)
-            {
-                await _mediator.Publish(domainEvent, cancellationToken);
-            }
+            await DispatchDomainEvents(cancellationToken);
         }
         
-        foreach (var entity in ChangeTracker.Entries<BaseEntity>())
-        {
-            entity.Entity.ClearDomainEvents();
-        }
-
         return result;
+    }
+    
+    private async Task DispatchDomainEvents(CancellationToken cancellationToken)
+    {
+        var entities = ChangeTracker
+            .Entries<BaseEntity>()
+            .Where(x => x.Entity.DomainEvents.Any())
+            .ToList();
+
+        var domainEvents = entities
+            .SelectMany(x => x.Entity.DomainEvents)
+            .ToList();
+
+        foreach (var entity in entities)
+            entity.Entity.ClearDomainEvents();
+
+        foreach (var domainEvent in domainEvents)
+        {
+            var notification = (INotification)Activator.CreateInstance(
+                typeof(DomainEventNotification<>)
+                    .MakeGenericType(domainEvent.GetType()),
+                domainEvent)!;
+
+            await _mediator.Publish(notification, cancellationToken);
+        }
     }
 }

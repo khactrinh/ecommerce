@@ -33,6 +33,7 @@ public class ProductController : ControllerBase
     }
     
     [HttpGet]
+    [AllowAnonymous]
     public async Task<IActionResult> Get([FromQuery] ProductFilter filter)
     {
         var result = await _mediator.Send(new GetProductsQuery(filter));
@@ -43,6 +44,7 @@ public class ProductController : ControllerBase
 
     
     [HttpGet("{id}")]
+    [AllowAnonymous]
     public async Task<IActionResult> GetById(Guid id)
     {
         var result = await _mediator.Send(new GetProductByIdQuery(id));

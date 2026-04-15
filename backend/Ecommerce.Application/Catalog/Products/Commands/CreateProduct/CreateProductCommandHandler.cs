@@ -1,5 +1,6 @@
 using Ecommerce.Application.Catalog.Products.Commands.CreateProduct;
 using Ecommerce.Application.Common.Interfaces;
+using Ecommerce.Domain.Catalog.Products;
 using Ecommerce.Domain.Exceptions;
 using Microsoft.EntityFrameworkCore;
 

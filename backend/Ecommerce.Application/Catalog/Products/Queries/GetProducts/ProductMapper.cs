@@ -1,4 +1,5 @@
 using Ecommerce.Application.Catalog.Products.Queries.GetProducts;
+using Ecommerce.Domain.Catalog.Products;
 using Ecommerce.Domain.Entities;
 
 namespace Ecommerce.Application.Catalog.GetProducts;

@@ -5,11 +5,14 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Ecommerce.Application.Common.Interfaces;
+using Ecommerce.Application.Common.Messaging;
 using Ecommerce.Application.Common.Models;
 using Ecommerce.Application.Interfaces;
+using Ecommerce.Infrastructure.BackgroundJobs;
 using Ecommerce.Infrastructure.Caching;
 using Ecommerce.Infrastructure.Data;
 using Ecommerce.Infrastructure.Identity;
+using Ecommerce.Infrastructure.Messaging;
 using Ecommerce.Infrastructure.Persistence;
 using Ecommerce.Infrastructure.Persistence.Repositories;
 using Ecommerce.Infrastructure.ReadModels.Categories;
@@ -98,6 +101,12 @@ public static class DependencyInjection
         services.AddScoped<ICacheService, RedisCacheService>();
         
         //// services.AddSingleton<IMessageBus, RabbitMqBus>();
+        services.AddHostedService<OutboxProcessor>();
+        
+        //services.AddSingleton<RabbitMqPublisher>();
+        services.AddHostedService<OutboxProcessor>();
+        
+        services.AddSingleton<IRabbitMqPublisher, RabbitMqPublisher>();
         
         return services;
     }

@@ -143,6 +143,7 @@ using Ecommerce.Application.Catalog.Products.Queries.GetProductById;
 using Ecommerce.Application.Catalog.Products.Queries.GetProducts;
 using Ecommerce.Application.Common.Caching;
 using Ecommerce.Application.Common.Interfaces;
+using Ecommerce.Application.Common.Models;
 
 namespace Ecommerce.Infrastructure.ReadModels.Products;
 
@@ -159,11 +160,11 @@ public class ProductQueryService : IProductQueryService
         _cache = cache;
     }
 
-    public async Task<(IEnumerable<ProductListItemDto> Items, int Total)> GetProducts(ProductFilter filter)
+    public async Task<ProductQueryResult> GetProducts(ProductFilter filter)
     {
         var cacheKey = CacheKeys.ProductList(filter);
 
-        return await _cache.GetOrSetAsync(
+        var result = await _cache.GetOrSetAsync(
             cacheKey,
             async () =>
             {
@@ -171,7 +172,7 @@ public class ProductQueryService : IProductQueryService
 
                 var offset = (filter.Page - 1) * filter.PageSize;
 
-                var where = new List<string> { "p.is_deleted = false" };
+                var where = new List<string>();
                 var param = new DynamicParameters();
 
                 if (!string.IsNullOrWhiteSpace(filter.Search))
@@ -184,12 +185,15 @@ public class ProductQueryService : IProductQueryService
                 {
                     var categoryIds = await _cache.GetOrSetAsync(
                         CacheKeys.CategoryTree(filter.CategoryId.Value),
-                        () => _categoryService.GetDescendantIds(filter.CategoryId.Value),
+                        async () => (await _categoryService.GetDescendantIds(filter.CategoryId.Value)) ?? new List<Guid>(),
                         TimeSpan.FromMinutes(30)
                     );
 
-                    where.Add("p.category_id = ANY(@CategoryIds)");
-                    param.Add("CategoryIds", categoryIds);
+                    if (categoryIds.Any())
+                    {
+                        where.Add("p.category_id = ANY(@CategoryIds)");
+                        param.Add("CategoryIds", categoryIds);
+                    }
                 }
 
                 if (filter.MinPrice.HasValue)
@@ -203,6 +207,8 @@ public class ProductQueryService : IProductQueryService
                     where.Add("p.price <= @MaxPrice");
                     param.Add("MaxPrice", filter.MaxPrice);
                 }
+
+                if (where.Count == 0) where.Add("1=1");
 
                 var whereClause = "WHERE " + string.Join(" AND ", where);
                 var orderBy = BuildOrderBy(filter.SortBy, filter.SortDirection);
@@ -225,10 +231,17 @@ public class ProductQueryService : IProductQueryService
                 var items = (await multi.ReadAsync<ProductListItemDto>()).ToList();
                 var total = await multi.ReadFirstAsync<int>();
 
-                return (items, total);
+                // return (items ?? new List<ProductListItemDto>(), total);
+                return new ProductQueryResult
+                {
+                    Items = items ?? new List<ProductListItemDto>(),
+                    Total = total
+                };
             },
             TimeSpan.FromMinutes(5)
         );
+
+        return result;
     }
 
     public async Task<ProductDetailDto?> GetById(Guid id)
@@ -244,7 +257,7 @@ public class ProductQueryService : IProductQueryService
                 p.image_url AS ImageUrl,
                 p.category_id AS CategoryId
             FROM products p
-            WHERE p.id = @Id AND p.is_deleted = false
+            WHERE p.id = @Id
         ";
 
         return await connection.QueryFirstOrDefaultAsync<ProductDetailDto>(

@@ -22,6 +22,40 @@ namespace Ecommerce.Infrastructure.Persistence.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("Ecommerce.Application.Orders.Sagas.OrderSagaState", b =>
+                {
+                    b.Property<Guid>("OrderId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("order_id");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<bool>("InventoryReserved")
+                        .HasColumnType("boolean")
+                        .HasColumnName("inventory_reserved");
+
+                    b.Property<bool>("PaymentCompleted")
+                        .HasColumnType("boolean")
+                        .HasColumnName("payment_completed");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("status");
+
+                    b.HasKey("OrderId")
+                        .HasName("pk_order_sagas");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("ix_order_sagas_status");
+
+                    b.ToTable("order_sagas", (string)null);
+                });
+
             modelBuilder.Entity("Ecommerce.Domain.Cart.Cart", b =>
                 {
                     b.Property<Guid>("Id")
@@ -77,12 +111,25 @@ namespace Ecommerce.Infrastructure.Persistence.Migrations
                     b.ToTable("cart_items", (string)null);
                 });
 
-            modelBuilder.Entity("Ecommerce.Domain.Entities.Category", b =>
+            modelBuilder.Entity("Ecommerce.Domain.Catalog.Products.Product", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
                         .HasColumnName("id");
+
+                    b.Property<Guid>("CategoryId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("category_id");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("ImageUrl")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("image_url");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -90,8 +137,81 @@ namespace Ecommerce.Infrastructure.Persistence.Migrations
                         .HasColumnType("character varying(200)")
                         .HasColumnName("name");
 
+                    b.Property<decimal>("Price")
+                        .HasColumnType("numeric")
+                        .HasColumnName("price");
+
+                    b.Property<int>("Stock")
+                        .HasColumnType("integer")
+                        .HasColumnName("stock");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("Id")
+                        .HasName("pk_products");
+
+                    b.HasIndex("CategoryId")
+                        .HasDatabaseName("idx_products_category");
+
+                    b.HasIndex("Name")
+                        .HasDatabaseName("idx_products_name");
+
+                    b.HasIndex("Price")
+                        .HasDatabaseName("idx_products_price");
+
+                    b.ToTable("products", (string)null);
+                });
+
+            modelBuilder.Entity("Ecommerce.Domain.Entities.Category", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text")
+                        .HasColumnName("description");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_deleted");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("name");
+
+                    b.Property<Guid?>("ParentId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("parent_id");
+
+                    b.Property<string>("Slug")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("slug");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
                     b.HasKey("Id")
                         .HasName("pk_categories");
+
+                    b.HasIndex("Name")
+                        .IsUnique()
+                        .HasDatabaseName("ix_categories_name");
+
+                    b.HasIndex("Slug")
+                        .IsUnique()
+                        .HasDatabaseName("ix_categories_slug");
 
                     b.ToTable("categories", (string)null);
                 });
@@ -162,53 +282,6 @@ namespace Ecommerce.Infrastructure.Persistence.Migrations
                         .HasDatabaseName("ix_order_items_order_id");
 
                     b.ToTable("order_items", (string)null);
-                });
-
-            modelBuilder.Entity("Ecommerce.Domain.Entities.Product", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
-
-                    b.Property<Guid>("CategoryId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("category_id");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
-
-                    b.Property<string>("ImageUrl")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("image_url");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)")
-                        .HasColumnName("name");
-
-                    b.Property<decimal>("Price")
-                        .HasColumnType("numeric")
-                        .HasColumnName("price");
-
-                    b.Property<int>("Stock")
-                        .HasColumnType("integer")
-                        .HasColumnName("stock");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at");
-
-                    b.HasKey("Id")
-                        .HasName("pk_products");
-
-                    b.HasIndex("CategoryId")
-                        .HasDatabaseName("ix_products_category_id");
-
-                    b.ToTable("products", (string)null);
                 });
 
             modelBuilder.Entity("Ecommerce.Domain.Identity.RefreshToken", b =>
@@ -337,6 +410,51 @@ namespace Ecommerce.Infrastructure.Persistence.Migrations
                     b.ToTable("user_roles", (string)null);
                 });
 
+            modelBuilder.Entity("Ecommerce.Infrastructure.Persistence.OutboxMessage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("content");
+
+                    b.Property<string>("Error")
+                        .HasColumnType("text")
+                        .HasColumnName("error");
+
+                    b.Property<DateTime>("OccurredOn")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("occurred_on");
+
+                    b.Property<DateTime?>("ProcessedOn")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("processed_on");
+
+                    b.Property<int>("RetryCount")
+                        .HasColumnType("integer")
+                        .HasColumnName("retry_count");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("type");
+
+                    b.HasKey("Id")
+                        .HasName("pk_outbox_messages");
+
+                    b.HasIndex("ProcessedOn")
+                        .HasDatabaseName("idx_outbox_unprocessed");
+
+                    b.HasIndex("ProcessedOn", "OccurredOn")
+                        .HasDatabaseName("ix_outbox_messages_processed_on_occurred_on");
+
+                    b.ToTable("outbox_messages", (string)null);
+                });
+
             modelBuilder.Entity("Ecommerce.Domain.Cart.CartItem", b =>
                 {
                     b.HasOne("Ecommerce.Domain.Cart.Cart", null)
@@ -347,6 +465,18 @@ namespace Ecommerce.Infrastructure.Persistence.Migrations
                         .HasConstraintName("fk_cart_items_carts_cart_id");
                 });
 
+            modelBuilder.Entity("Ecommerce.Domain.Catalog.Products.Product", b =>
+                {
+                    b.HasOne("Ecommerce.Domain.Entities.Category", "Category")
+                        .WithMany()
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_products_categories_category_id");
+
+                    b.Navigation("Category");
+                });
+
             modelBuilder.Entity("Ecommerce.Domain.Entities.OrderItem", b =>
                 {
                     b.HasOne("Ecommerce.Domain.Entities.Order", null)
@@ -355,18 +485,6 @@ namespace Ecommerce.Infrastructure.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_order_items_orders_order_id");
-                });
-
-            modelBuilder.Entity("Ecommerce.Domain.Entities.Product", b =>
-                {
-                    b.HasOne("Ecommerce.Domain.Entities.Category", "Category")
-                        .WithMany("Products")
-                        .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_products_categories_category_id");
-
-                    b.Navigation("Category");
                 });
 
             modelBuilder.Entity("Ecommerce.Domain.Identity.UserRole", b =>
@@ -393,11 +511,6 @@ namespace Ecommerce.Infrastructure.Persistence.Migrations
             modelBuilder.Entity("Ecommerce.Domain.Cart.Cart", b =>
                 {
                     b.Navigation("_items");
-                });
-
-            modelBuilder.Entity("Ecommerce.Domain.Entities.Category", b =>
-                {
-                    b.Navigation("Products");
                 });
 
             modelBuilder.Entity("Ecommerce.Domain.Entities.Order", b =>
