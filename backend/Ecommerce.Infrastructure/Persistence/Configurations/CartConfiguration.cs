@@ -8,13 +8,23 @@ public class CartConfiguration : IEntityTypeConfiguration<Cart>
 {
     public void Configure(EntityTypeBuilder<Cart> builder)
     {
-        builder.HasKey(x => x.Id);
+        // builder.HasKey(x => x.Id);
+        //
+        // builder.HasMany<CartItem>("_items")
+        //     .WithOne()
+        //     .HasForeignKey("CartId")
+        //     .OnDelete(DeleteBehavior.Cascade);
+        //
+        // builder.Ignore(x => x.Items);
+        
+        builder.HasKey(x => x.UserId);
 
-        builder.HasMany<CartItem>("_items")
+        builder.HasMany(c => c.Items)
             .WithOne()
-            .HasForeignKey("CartId")
+            .HasForeignKey("CartUserId")
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.Ignore(x => x.Items);
+        builder.Navigation(c => c.Items)
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
     }
 }

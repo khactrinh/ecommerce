@@ -4,7 +4,7 @@ using Ecommerce.Application;
 using Ecommerce.Application.Common.Models;
 using Ecommerce.Application.Orders.Sagas;
 using Ecommerce.Infrastructure;
-using Ecommerce.Infrastructure.Messaging;
+using Ecommerce.Infrastructure.Payments;
 //using Ecommerce.Infrastructure.BackgroundJobs;
 using Ecommerce.Infrastructure.Persistence;
 using Ecommerce.Infrastructure.Persistence.Dapper;
@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -45,6 +46,10 @@ builder.Services.AddSwaggerGen(options =>
 
 builder.Services.AddInfrastructure(builder.Configuration);
 
+//TODO : đúng vị trí chưa
+builder.Host.UseSerilog((ctx, lc) =>
+    lc.WriteTo.Console());
+
 //builder.Services.AddHostedService<OutboxProcessor>();
 
 // builder.Services.AddCors(options =>
@@ -61,6 +66,10 @@ builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.Configure<JwtSettings>(
     builder.Configuration.GetSection("Jwt"));
 
+builder.Services.Configure<VnPayOptions>(
+    builder.Configuration.GetSection("Vnpay"));
+
+builder.Services.AddHttpContextAccessor();
 
 var jwt = builder.Configuration.GetSection("Jwt").Get<JwtSettings>();
 builder.Services.AddAuthentication(options =>
@@ -148,8 +157,20 @@ app.UseMiddleware<ExceptionMiddleware>();
 
 app.UseCors("AllowFrontend");
 
+app.UseRouting();
+
+// 👇 THÊM Ở ĐÂY (debug middleware)
+app.Use(async (context, next) =>
+{
+    var auth = context.Request.Headers["Authorization"].ToString();
+    Console.WriteLine($"AUTH HEADER: {auth}");
+
+    await next();
+});
+
 app.UseAuthentication();
 app.UseAuthorization();
+
 
 app.MapControllers();
 

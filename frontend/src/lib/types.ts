@@ -15,6 +15,15 @@ export interface Product {
   categoryId?: string;
 }
 
+// ✅ ADD THIS
+export interface CartItem {
+  productId: string;
+  productName: string;
+  price: number;
+  quantity: number;
+  imageUrl?: string;
+}
+
 export interface PaginatedResponse<T> {
   items: T[];
   page: number;
@@ -30,6 +39,7 @@ export interface LoginResponse {
   refreshToken: string;
 }
 
+// backend bạn đang dùng ApiResponse<T>
 export interface ApiResponse<T> {
   success: boolean;
   message: string;

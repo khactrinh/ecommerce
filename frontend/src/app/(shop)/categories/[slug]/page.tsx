@@ -40,16 +40,16 @@ export default function CategoryPage() {
         if (found) {
           setCategory(found);
           
-          // 2. Fetch products using the found CategoryId (PascalCase as per curl example)
-          const prodRes = await api.get<ApiResponse<PaginatedResponse<Product>>>(
+          // 2. Fetch products using the found CategoryId
+          // The api utility automatically unwraps the 'data' field
+          const productsData = await api.get<PaginatedResponse<Product>>(
             `/api/Product?CategoryId=${found.id}&PageSize=20`
           );
           
-          // Products are confirmed to be in prodRes.data.items
-          if (prodRes.success && prodRes.data) {
-            setProducts(prodRes.data.items || []);
+          if (productsData && productsData.items) {
+            setProducts(productsData.items);
           } else {
-            console.warn("Product API success was false or data was missing", prodRes);
+            setProducts([]);
           }
         } else {
           setError("Không tìm thấy danh mục này.");

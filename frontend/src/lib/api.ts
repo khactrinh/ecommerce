@@ -1,13 +1,19 @@
-import { ApiResponse, LoginResponse } from "./types";
+import type { LoginResponse } from "./types";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5204";
+
+export class ApiError extends Error {
+  constructor(
+    public status: number,
+    public data: any,
+  ) {
+    super(data?.message || `API Error ${status}`);
+  }
+}
 
 class ApiClient {
   private refreshPromise: Promise<boolean> | null = null;
 
-  // ======================
-  // TOKEN HANDLING
-  // ======================
   private getToken() {
     if (typeof window === "undefined") return null;
     return localStorage.getItem("auth_token");
@@ -28,9 +34,6 @@ class ApiClient {
     localStorage.setItem("refresh_token", token);
   }
 
-  // ======================
-  // CORE REQUEST
-  // ======================
   private async request<T>(
     endpoint: string,
     options: RequestInit = {},
@@ -38,21 +41,23 @@ class ApiClient {
   ): Promise<T> {
     const token = this.getToken();
 
+    const isAuthEndpoint =
+      endpoint.includes("/api/v1/auth/login") ||
+      endpoint.includes("/api/v1/auth/refresh");
+
     const headers = new Headers(options.headers || {});
     headers.set("accept", "*/*");
 
-    // chỉ set JSON nếu không phải FormData
     if (!(options.body instanceof FormData)) {
       headers.set("Content-Type", "application/json");
     }
 
-    if (token) {
+    if (token && !isAuthEndpoint) {
       headers.set("Authorization", `Bearer ${token}`);
     }
 
-    // timeout
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 10000);
+    const timeout = setTimeout(() => controller.abort(), 15000);
 
     try {
       const response = await fetch(`${BASE_URL}${endpoint}`, {
@@ -61,41 +66,40 @@ class ApiClient {
         signal: controller.signal,
       });
 
-      // ======================
-      // HANDLE 401 + REFRESH
-      // ======================
+      // refresh token
       if (response.status === 401 && !isRetry) {
-        const refreshed = await this.refreshToken();
-
-        if (refreshed) {
-          return this.request<T>(endpoint, options, true);
-        }
-
+        const ok = await this.refreshToken();
+        if (ok) return this.request<T>(endpoint, options, true);
         throw new ApiError(401, { message: "Unauthorized" });
       }
 
-      // ======================
-      // HANDLE ERROR
-      // ======================
+      // error
       if (!response.ok) {
         let errorData: any = {};
-
         try {
           errorData = await response.json();
         } catch {}
-
         throw new ApiError(response.status, errorData);
       }
 
-      return await response.json();
+      // ✅ FIX: handle empty response
+      const text = await response.text();
+      if (!text) return null as T;
+
+      const json = JSON.parse(text);
+
+      // nếu có wrapper ApiResponse
+      if (json?.data !== undefined) {
+        return json.data as T;
+      }
+
+      // nếu raw response (login, refresh cũ)
+      return json as T;
     } finally {
       clearTimeout(timeout);
     }
   }
 
-  // ======================
-  // REFRESH TOKEN (LOCKED)
-  // ======================
   private async refreshToken(): Promise<boolean> {
     if (this.refreshPromise) return this.refreshPromise;
 
@@ -121,9 +125,6 @@ class ApiClient {
         this.setRefreshToken(data.refreshToken);
 
         return true;
-      } catch (err) {
-        console.error("Refresh token failed", err);
-        return false;
       } finally {
         this.refreshPromise = null;
       }
@@ -132,9 +133,6 @@ class ApiClient {
     return this.refreshPromise;
   }
 
-  // ======================
-  // METHODS
-  // ======================
   get<T>(endpoint: string, options?: RequestInit) {
     return this.request<T>(endpoint, {
       ...options,
@@ -148,18 +146,6 @@ class ApiClient {
       method: "POST",
       body: JSON.stringify(body),
     });
-  }
-}
-
-// ======================
-// CUSTOM ERROR CLASS
-// ======================
-export class ApiError extends Error {
-  constructor(
-    public status: number,
-    public data: any,
-  ) {
-    super(data?.message || `API Error ${status}`);
   }
 }
 

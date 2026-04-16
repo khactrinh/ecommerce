@@ -7,7 +7,6 @@ using Microsoft.EntityFrameworkCore;
 namespace Ecommerce.Application.Catalog.Products.Commands;
 
 using MediatR;
-using Ecommerce.Domain.Entities;
 
 public class CreateProductCommandHandler 
     : IRequestHandler<CreateProductCommand, Guid>

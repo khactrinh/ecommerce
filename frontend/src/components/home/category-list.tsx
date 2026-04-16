@@ -10,11 +10,10 @@ export default function CategoryList() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    api.get<any>("/api/categories")
+    api.get<PaginatedResponse<Category>>("/api/categories")
       .then(res => {
-        const data = (res.data || res) as PaginatedResponse<Category>;
-        if (data && data.items) {
-          setCategories(data.items.filter(c => !c.parentId));
+        if (res && res.items) {
+          setCategories(res.items.filter(c => !c.parentId));
         }
       })
       .catch(err => console.error("Failed to fetch categories", err))

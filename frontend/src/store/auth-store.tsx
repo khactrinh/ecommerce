@@ -36,7 +36,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setUser({
           id: payload.sub,
           email: payload.email,
-          role: payload["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"],
+          role: payload[
+            "http://schemas.microsoft.com/ws/2008/06/identity/claims/role"
+          ],
         });
       } catch (e) {
         localStorage.removeItem("auth_token");
@@ -56,13 +58,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem("auth_token", jwt);
     localStorage.setItem("refresh_token", response.refreshToken);
     setToken(jwt);
-    
-    const payload = JSON.parse(atob(jwt.split(".")[1]));
-    setUser({
-      id: payload.sub,
-      email: payload.email,
-      role: payload["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"],
-    });
+
+    const decodeJwt = (token: string) => {
+      try {
+        return JSON.parse(atob(token.split(".")[1]));
+      } catch {
+        return null;
+      }
+    };
+
+    const payload = decodeJwt(jwt);
+
+    if (payload) {
+      setUser({
+        id: payload.sub,
+        email: payload.email,
+        role: payload[
+          "http://schemas.microsoft.com/ws/2008/06/identity/claims/role"
+        ],
+      });
+    }
   };
 
   const logout = () => {

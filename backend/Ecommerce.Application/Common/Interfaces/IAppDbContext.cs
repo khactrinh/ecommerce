@@ -1,5 +1,5 @@
+using Ecommerce.Domain.Catalog.Categories;
 using Ecommerce.Domain.Catalog.Products;
-using Ecommerce.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Ecommerce.Application.Common.Interfaces;

@@ -8,8 +8,8 @@ export default async function HomePage() {
   let products: Product[] = [];
   
   try {
-    const res = await api.get<ApiResponse<PaginatedResponse<Product>>>("/api/Product?PageSize=10");
-    products = res.data.items;
+    const res = await api.get<PaginatedResponse<Product>>("/api/Product?PageSize=10");
+    products = res.items;
   } catch (error) {
     console.error("Failed to fetch products for home page", error);
     // In production, you might show a fallback or notify the user

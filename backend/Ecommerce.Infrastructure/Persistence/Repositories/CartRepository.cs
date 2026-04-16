@@ -1,4 +1,4 @@
-using Ecommerce.Application.Cart.Interfaces;
+using Ecommerce.Application.Carts.Interfaces;
 using Ecommerce.Domain.Cart;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,17 +20,20 @@ public class CartRepository : ICartRepository
             .FirstOrDefaultAsync(c => c.UserId == userId);
     }
 
+    public async Task Add(Cart cart)
+    {
+        await _context.Carts.AddAsync(cart);
+    }
+
     public async Task ClearAsync(Guid userId)
     {
         var cart = await _context.Carts
             .Include(c => c.Items)
             .FirstOrDefaultAsync(c => c.UserId == userId);
 
-        if (cart != null)
-        {
-            _context.CartItems.RemoveRange(cart.Items);
-            _context.Carts.Remove(cart);
-            await _context.SaveChangesAsync();
-        }
+        if (cart == null) return;
+
+        _context.CartItems.RemoveRange(cart.Items);
+        _context.Carts.Remove(cart);
     }
 }

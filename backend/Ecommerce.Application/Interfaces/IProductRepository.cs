@@ -1,5 +1,4 @@
 using Ecommerce.Domain.Catalog.Products;
-using Ecommerce.Domain.Entities;
 
 namespace Ecommerce.Application.Interfaces;
 

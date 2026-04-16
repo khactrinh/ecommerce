@@ -1,6 +1,5 @@
 using Ecommerce.Application.Interfaces;
 using Ecommerce.Domain.Catalog.Products;
-using Ecommerce.Domain.Entities;
 
 namespace Ecommerce.Infrastructure.Persistence.Repositories;
 

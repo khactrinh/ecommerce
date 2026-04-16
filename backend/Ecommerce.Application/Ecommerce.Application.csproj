@@ -23,6 +23,7 @@
 
   <ItemGroup>
     <Folder Include="Catalog\" />
+    <Folder Include="Orders\Commands\" />
   </ItemGroup>
 
 </Project>

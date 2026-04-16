@@ -8,11 +8,16 @@ public class CartItemConfiguration : IEntityTypeConfiguration<CartItem>
 {
     public void Configure(EntityTypeBuilder<CartItem> builder)
     {
-        builder.HasKey(x => x.Id);
+        // builder.HasKey(x => x.Id);
+        //
+        // builder.Property<Guid>("CartId");
+        //
+        // builder.Property(x => x.ProductName)
+        //     .HasMaxLength(255);
+        
+        builder.HasKey("ProductId", "CartUserId");
 
-        builder.Property<Guid>("CartId");
-
-        builder.Property(x => x.ProductName)
-            .HasMaxLength(255);
+        builder.Property(x => x.Price).IsRequired();
+        builder.Property(x => x.Quantity).IsRequired();
     }
 }

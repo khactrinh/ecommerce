@@ -1,4 +1,4 @@
-using Ecommerce.Domain.Entities;
+using Ecommerce.Domain.Orders;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -11,9 +11,6 @@ public class OrderItemConfiguration : IEntityTypeConfiguration<OrderItem>
         builder.HasKey(x => x.Id);
 
         builder.Property<Guid>("OrderId");
-
-        builder.Property(x => x.ProductName)
-            .HasMaxLength(255);
 
         builder.Property(x => x.Price)
             .HasColumnType("decimal(18,2)");

@@ -3,15 +3,17 @@ using Ecommerce.Application.Common.Events;
 using Ecommerce.Application.Common.Interfaces;
 using Ecommerce.Application.Orders.Sagas;
 using Ecommerce.Domain.Cart;
+using Ecommerce.Domain.Catalog.Categories;
 using Ecommerce.Domain.Catalog.Products;
 using Ecommerce.Domain.Common;
 using Ecommerce.Domain.Identity;
+using Ecommerce.Domain.Orders;
 using MediatR;
 
 namespace Ecommerce.Infrastructure.Persistence;
 
 using Microsoft.EntityFrameworkCore;
-using Ecommerce.Domain.Entities;
+
 public class AppDbContext : DbContext, IAppDbContext
 {
     private readonly IMediator? _mediator;

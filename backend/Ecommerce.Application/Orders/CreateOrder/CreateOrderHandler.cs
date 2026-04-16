@@ -1,6 +1,4 @@
-using Ecommerce.Application.Cart.Interfaces;
 using Ecommerce.Application.Common.Interfaces;
-using Ecommerce.Domain.Entities;
 using MediatR;
 
 namespace Ecommerce.Application.Orders.CreateOrder;

@@ -1,5 +1,5 @@
 using System.Data;
-using Ecommerce.Application.Cart.Interfaces;
+using Ecommerce.Application.Carts.Interfaces;
 using Ecommerce.Application.Catalog.Products.Queries.GetProductById;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -13,6 +13,7 @@ using Ecommerce.Infrastructure.Caching;
 using Ecommerce.Infrastructure.Data;
 using Ecommerce.Infrastructure.Identity;
 using Ecommerce.Infrastructure.Messaging;
+using Ecommerce.Infrastructure.Payments;
 using Ecommerce.Infrastructure.Persistence;
 using Ecommerce.Infrastructure.Persistence.Repositories;
 using Ecommerce.Infrastructure.ReadModels.Categories;
@@ -107,6 +108,9 @@ public static class DependencyInjection
         services.AddHostedService<OutboxProcessor>();
         
         services.AddSingleton<IRabbitMqPublisher, RabbitMqPublisher>();
+        services.AddScoped<IPaymentService, VnPayService>();
+        
+        services.AddScoped<ICartRepository, CartRepository>();
         
         return services;
     }

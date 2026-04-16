@@ -1,6 +1,6 @@
 using MediatR;
-using Ecommerce.Domain.Entities;
 using Ecommerce.Application.Common.Interfaces;
+using Ecommerce.Domain.Catalog.Categories;
 
 namespace Ecommerce.Application.Features.Categories.Commands.CreateCategory;
 

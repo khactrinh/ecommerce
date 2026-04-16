@@ -1,6 +1,8 @@
-using Ecommerce.Application.Features.Auth.Login;
+using Ecommerce.Application.Auth.Login;
+using Ecommerce.Application.Auth.Refresh;
 using Ecommerce.Application.Features.Auth.Logout;
 using Ecommerce.Application.Features.Auth.Refresh;
+using Ecommerce.Shared.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -22,7 +24,7 @@ public class AuthController : ControllerBase
         command = command with { IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString() };
 
         var result = await _mediator.Send(command);
-        return Ok(result);
+        return Ok(ApiResponse<LoginResponse>.SuccessResponse(result));
     }
 
     [HttpPost("refresh")]
@@ -31,7 +33,7 @@ public class AuthController : ControllerBase
         command = command with { IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString() };
 
         var result = await _mediator.Send(command);
-        return Ok(result);
+        return Ok(ApiResponse<RefreshTokenResponse>.SuccessResponse(result));
     }
     
     [HttpPost("logout")]
@@ -43,7 +45,7 @@ public class AuthController : ControllerBase
         var command = new LogoutCommand(refreshToken, ip, jwt);
 
         await _mediator.Send(command);
-        return Ok();
+        return Ok(ApiResponse<string>.SuccessResponse("Logged out"));
     }
     
     [Authorize]
@@ -58,6 +60,6 @@ public class AuthController : ControllerBase
         );
 
         await _mediator.Send(command);
-        return Ok();
+        return Ok(ApiResponse<string>.SuccessResponse("Logged out"));
     }
 }

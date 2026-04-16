@@ -1,6 +1,6 @@
+using Ecommerce.Domain.Catalog.Categories;
 using Ecommerce.Domain.Catalog.Products.Events;
 using Ecommerce.Domain.Common;
-using Ecommerce.Domain.Entities;
 using Ecommerce.Domain.Events;
 
 namespace Ecommerce.Domain.Catalog.Products;

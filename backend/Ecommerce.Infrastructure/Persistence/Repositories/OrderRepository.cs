@@ -1,5 +1,6 @@
 using Ecommerce.Application.Common.Interfaces;
-using Ecommerce.Domain.Entities;
+using Ecommerce.Domain.Orders;
+using Microsoft.EntityFrameworkCore;
 
 namespace Ecommerce.Infrastructure.Persistence.Repositories;
 
@@ -16,5 +17,12 @@ public class OrderRepository : IOrderRepository
     {
         _context.Orders.Add(order);
         await _context.SaveChangesAsync();
+    }
+
+    public async Task<Order?> GetByIdAsync(Guid id)
+    {
+        return await _context.Orders
+            .Include(o => o.Items) // 🔥 IMPORTANT
+            .FirstOrDefaultAsync(o => o.Id == id);
     }
 }
