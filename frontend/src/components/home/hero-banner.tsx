@@ -7,45 +7,73 @@ export default function HeroBanner() {
   const router = useRouter();
 
   return (
-      <div className="relative h-[500px] w-full bg-gray-900 rounded-3xl overflow-hidden shadow-2xl">
-        <div className="absolute inset-0 bg-gradient-to-r from-gray-900 via-gray-900/40 to-transparent z-10" />
+    <div className="relative w-full h-[600px] rounded-[40px] overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.1)] group">
+      {/* Background Image - THE GENERATED ONE */}
+      <img
+        src="/hero_tech_premium_1776320547998.png"
+        alt="Premium Tech Experience"
+        className="absolute inset-0 w-full h-full object-cover scale-100 group-hover:scale-105 transition duration-[2s] ease-out"
+      />
 
-        <img
-            src="https://images.unsplash.com/photo-1519389950473-acc71958480c?auto=format&fit=crop&q=80&w=2000"
-            alt="Hero Background"
-            className="absolute inset-0 w-full h-full object-cover"
-        />
+      {/* Enhanced Gradient Overlays for High Contrast */}
+      <div className="absolute inset-0 bg-gradient-to-r from-black/95 via-black/40 to-transparent z-[1]" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent z-[1]" />
 
-        <div className="relative z-20 h-full flex flex-col justify-center px-10 md:px-20 max-w-2xl gap-6">
-          <div className="space-y-2">
-          <span className="text-primary font-bold tracking-widest text-sm uppercase">
-            Limited Edition
-          </span>
-            <h1 className="text-5xl md:text-7xl font-black text-white leading-tight">
-              New Tech <br /> Evolution.
-            </h1>
+      {/* Content */}
+      <div className="relative z-10 h-full flex items-center px-8 md:px-20">
+        <div className="max-w-2xl space-y-8">
+          {/* Badge */}
+          <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-white/10 backdrop-blur-2xl border border-white/20 shadow-xl">
+            <span className="flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-2 w-2 rounded-full bg-blue-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+            </span>
+            <span className="text-[10px] md:text-xs text-white font-bold uppercase tracking-[0.2em]">
+              New Arrival • 2026 Collection
+            </span>
           </div>
 
-          <p className="text-gray-300 text-lg">
-            Experience the next generation of performance and design. Limited stock available now.
+          {/* Title */}
+          <h1 className="text-5xl md:text-8xl font-black text-white leading-[0.9] tracking-tighter drop-shadow-[0_10px_30px_rgba(0,0,0,0.5)]">
+            Elevate Your <br />
+            <span className="text-blue-400">Digital Life</span>
+          </h1>
+
+          {/* Description */}
+          <p className="text-white/90 text-lg md:text-xl font-medium leading-relaxed max-w-lg drop-shadow-md">
+            Meticulously crafted hardware for the modern professional. Experience power and elegance in every detail.
           </p>
 
-          <div className="flex gap-4">
-            <Button
-                onClick={() => router.push("/products")}
-                className="px-8 py-4 h-14 hover:text-primary text-gray-900 hover:bg-gray-200"
+          {/* Buttons */}
+          <div className="flex flex-wrap gap-5">
+            <button
+              onClick={() => router.push("/products")}
+              className="px-10 py-4 bg-white text-black font-bold rounded-2xl hover:bg-blue-500 hover:text-white transition-all transform hover:scale-105 active:scale-95 shadow-2xl"
             >
               Shop Collection
-            </Button>
+            </button>
 
-            <Button
-                variant="outline"
-                className="px-8 py-4 h-14 text-white border-white hover:bg-white/10"
+            <button
+              onClick={() => router.push("/categories")}
+              className="px-10 py-4 bg-white/10 backdrop-blur-xl text-white font-bold rounded-2xl border border-white/20 hover:bg-white/20 transition-all shadow-xl"
             >
-              Learn More
-            </Button>
+              Explore Tech
+            </button>
+          </div>
+
+          {/* Stats/Trust */}
+          <div className="flex gap-10 pt-4 opacity-70">
+            <div className="text-white">
+              <p className="text-2xl font-black">24k+</p>
+              <p className="text-[10px] uppercase tracking-widest font-bold">Happy Clients</p>
+            </div>
+            <div className="text-white">
+              <p className="text-2xl font-black">4.9/5</p>
+              <p className="text-[10px] uppercase tracking-widest font-bold">Average Rating</p>
+            </div>
           </div>
         </div>
       </div>
+    </div>
   );
 }

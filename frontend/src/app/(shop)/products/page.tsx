@@ -12,8 +12,6 @@ export default function ProductsPage() {
 
   const { data, isLoading } = useProducts(page, 12, categoryId);
 
-  console.log("PRODUCT API RESULT:", data);
-
   if (isLoading) {
     return <div className="p-6">Loading...</div>;
   }

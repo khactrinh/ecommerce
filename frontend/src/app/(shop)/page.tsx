@@ -4,10 +4,24 @@ import HeroBanner from "@/components/home/hero-banner";
 import CategoryList from "@/components/home/category-list";
 import ProductSection from "@/components/home/product-section";
 import { useProducts } from "@/hooks/useProducts";
+import { useEffect, useState } from "react";
+import { api } from "@/lib/api";
 
 export default function HomePage() {
   // Featured products
   const { data } = useProducts(1, 8);
+
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    api
+      .get("/api/categories/tree")
+      .then((res) => {
+        setCategories(res || []);
+        console.log("CATEGORIES API RESULT:", res);
+      })
+      .catch(console.error);
+  }, []);
 
   return (
     <div className="bg-gray-50">
@@ -25,7 +39,7 @@ export default function HomePage() {
           </p>
         </div>
 
-        <CategoryList />
+        <CategoryList categories={categories} />
       </section>
 
       {/* ================= FLASH SALE ================= */}
