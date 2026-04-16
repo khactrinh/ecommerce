@@ -119,7 +119,10 @@ class ApiClient {
 
         if (!resp.ok) return false;
 
-        const data: LoginResponse = await resp.json();
+        const json = await resp.json();
+        const data = json.data || json; // Handle both wrapped and unwrapped for safety
+
+        if (!data || !data.accessToken) return false;
 
         this.setToken(data.accessToken);
         this.setRefreshToken(data.refreshToken);

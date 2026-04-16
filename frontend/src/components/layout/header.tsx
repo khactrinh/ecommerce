@@ -3,26 +3,14 @@
 import Link from "next/link";
 import { useAuth } from "@/store/auth-store";
 import { useCart } from "@/store/cart-store";
-import { useEffect, useState } from "react";
-import { api } from "@/lib/api";
-import { Category, PaginatedResponse } from "@/lib/types";
+
+import { useCategories } from "@/hooks/useCategories";
+import CategoryMenu from "./category-menu";
 
 export default function Header() {
   const { user, logout } = useAuth();
   const { totalItems } = useCart();
-  const [categories, setCategories] = useState<Category[]>([]);
-
-  useEffect(() => {
-    api
-      .get<any>("/api/categories")
-      .then((res) => {
-        const data = (res.data || res) as PaginatedResponse<Category>;
-        if (data && data.items) {
-          setCategories(data.items.filter((c) => !c.parentId));
-        }
-      })
-      .catch((err) => console.error("Failed to fetch categories", err));
-  }, []);
+  const { categories } = useCategories();
 
   return (
     <header className="bg-white/80 backdrop-blur-md border-b sticky top-0 z-50">
@@ -36,16 +24,9 @@ export default function Header() {
         </Link>
 
         {/* Categories Desktop */}
+        {/* Categories Desktop */}
         <nav className="hidden md:flex items-center gap-6">
-          {categories.slice(0, 5).map((cat) => (
-            <Link
-              key={cat.id}
-              href={`/categories/${cat.slug}`}
-              className="text-sm font-medium text-gray-600 hover:text-primary transition"
-            >
-              {cat.name}
-            </Link>
-          ))}
+          <CategoryMenu categories={categories.slice(0, 5)} />
         </nav>
 
         {/* Search */}
