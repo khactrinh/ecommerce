@@ -26,25 +26,41 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const savedToken = localStorage.getItem("auth_token");
-    if (savedToken) {
-      setToken(savedToken);
-      // In a real app, you might want to fetch user profile here
-      // decode token to get user info for now
-      try {
-        const payload = JSON.parse(atob(savedToken.split(".")[1]));
-        setUser({
-          id: payload.sub,
-          email: payload.email,
-          role: payload[
-            "http://schemas.microsoft.com/ws/2008/06/identity/claims/role"
-          ],
-        });
-      } catch (e) {
-        localStorage.removeItem("auth_token");
+    const checkAuth = () => {
+      const savedToken = localStorage.getItem("auth_token");
+      if (savedToken) {
+        setToken(savedToken);
+        try {
+          const payload = JSON.parse(atob(savedToken.split(".")[1]));
+          setUser({
+            id: payload.sub,
+            email: payload.email,
+            role: payload[
+              "http://schemas.microsoft.com/ws/2008/06/identity/claims/role"
+            ],
+          });
+        } catch (e) {
+          localStorage.removeItem("auth_token");
+          setUser(null);
+          setToken(null);
+        }
+      } else {
+        setUser(null);
+        setToken(null);
       }
-    }
-    setIsLoading(false);
+      setIsLoading(false);
+    };
+
+    checkAuth();
+
+    const handleExpired = () => {
+      setUser(null);
+      setToken(null);
+      // Optional: Redirect to login or show modal
+    };
+
+    window.addEventListener("auth_expired", handleExpired);
+    return () => window.removeEventListener("auth_expired", handleExpired);
   }, []);
 
   const login = async (email: string, password: string) => {

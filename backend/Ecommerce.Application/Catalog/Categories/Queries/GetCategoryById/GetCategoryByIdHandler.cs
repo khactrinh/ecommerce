@@ -2,13 +2,13 @@ using Dapper;
 using Ecommerce.Domain.Exceptions;
 using MediatR;
 using System.Data;
+using Ecommerce.Application.Catalog.Categories.Dtos;
 using Ecommerce.Application.Features.Categories.Queries.GetCategories;
-using Ecommerce.Application.Features.Categories.Queries.GetCategoryById;
 
 namespace Ecommerce.Application.Catalog.Categories.Queries.GetCategoryById;
 
 public class GetCategoryByIdHandler 
-    : IRequestHandler<GetCategoryByIdQuery, CategoryDto>
+    : IRequestHandler<GetCategoryByIdQuery, CategoryDetailResponse>
 {
     private readonly IDbConnection _connection;
 
@@ -17,7 +17,7 @@ public class GetCategoryByIdHandler
         _connection = connection;
     }
 
-    public async Task<CategoryDto> Handle(
+    public async Task<CategoryDetailResponse> Handle(
         GetCategoryByIdQuery request, 
         CancellationToken cancellationToken)
     {
@@ -27,7 +27,7 @@ public class GetCategoryByIdHandler
             WHERE id = @Id AND is_deleted = false
         ";
 
-        var category = await _connection.QueryFirstOrDefaultAsync<CategoryDto>(
+        var category = await _connection.QueryFirstOrDefaultAsync<CategoryDetailResponse>(
             sql,
             new { request.Id }
         );

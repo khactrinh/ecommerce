@@ -1,6 +1,9 @@
 using Ecommerce.Application.Features.Categories.Queries.GetCategories;
 using MediatR;
 
-namespace Ecommerce.Application.Features.Categories.Queries.GetCategoryById;
+using Ecommerce.Application.Catalog.Categories.Dtos;
 
-public record GetCategoryByIdQuery(Guid Id) : IRequest<CategoryDto>;
+namespace Ecommerce.Application.Catalog.Categories.Queries.GetCategoryById;
+
+public record GetCategoryByIdQuery(Guid Id)
+    : IRequest<CategoryDetailResponse>;

@@ -4,8 +4,8 @@ const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5204";
 
 export class ApiError extends Error {
   constructor(
-    public status: number,
-    public data: any,
+      public status: number,
+      public data: any,
   ) {
     super(data?.message || `API Error ${status}`);
   }
@@ -35,15 +35,15 @@ class ApiClient {
   }
 
   private async request<T>(
-    endpoint: string,
-    options: RequestInit = {},
-    isRetry = false,
+      endpoint: string,
+      options: RequestInit = {},
+      isRetry = false,
   ): Promise<T> {
     const token = this.getToken();
 
     const isAuthEndpoint =
-      endpoint.includes("/api/v1/auth/login") ||
-      endpoint.includes("/api/v1/auth/refresh");
+        endpoint.includes("/api/v1/auth/login") ||
+        endpoint.includes("/api/v1/auth/refresh");
 
     const headers = new Headers(options.headers || {});
     headers.set("accept", "*/*");
@@ -66,14 +66,24 @@ class ApiClient {
         signal: controller.signal,
       });
 
-      // refresh token
+      // 🔥 Auto refresh token khi 401
       if (response.status === 401 && !isRetry) {
         const ok = await this.refreshToken();
+
         if (ok) return this.request<T>(endpoint, options, true);
+
+        // hết hạn login → clear
+        console.warn("Session expired. Clearing auth data.");
+        if (typeof window !== "undefined") {
+          localStorage.removeItem("auth_token");
+          localStorage.removeItem("refresh_token");
+          window.dispatchEvent(new Event("auth_expired"));
+        }
+
         throw new ApiError(401, { message: "Unauthorized" });
       }
 
-      // error
+      // ❌ HTTP error
       if (!response.ok) {
         let errorData: any = {};
         try {
@@ -82,18 +92,29 @@ class ApiClient {
         throw new ApiError(response.status, errorData);
       }
 
-      // ✅ FIX: handle empty response
+      // ✅ parse response
       const text = await response.text();
       if (!text) return null as T;
 
-      const json = JSON.parse(text);
-
-      // nếu có wrapper ApiResponse
-      if (json?.data !== undefined) {
-        return json.data as T;
+      let json: any;
+      try {
+        json = JSON.parse(text);
+      } catch {
+        throw new ApiError(response.status, {
+          message: "Invalid JSON response",
+        });
       }
 
-      // nếu raw response (login, refresh cũ)
+      // 🔥🔥 QUAN TRỌNG NHẤT: handle ApiResponse<T>
+      if (typeof json === "object" && "success" in json) {
+        if (!json.success) {
+          throw new ApiError(response.status, json);
+        }
+
+        return json.data as T; // ✅ luôn unwrap
+      }
+
+      // fallback (login / refresh / legacy)
       return json as T;
     } finally {
       clearTimeout(timeout);
@@ -108,26 +129,48 @@ class ApiClient {
       if (!refreshToken) return false;
 
       try {
+        console.log("Attempting to refresh token...");
+
         const resp = await fetch(`${BASE_URL}/api/v1/auth/refresh`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             accept: "*/*",
           },
-          body: JSON.stringify({ token: refreshToken }),
+          body: JSON.stringify({
+            token: refreshToken,
+            Token: refreshToken,
+            ipAddress: "",
+          }),
         });
 
-        if (!resp.ok) return false;
+        if (!resp.ok) {
+          console.error("Refresh token request failed", resp.status);
+          return false;
+        }
 
         const json = await resp.json();
-        const data = json.data || json; // Handle both wrapped and unwrapped for safety
+        const data = json.data || json;
 
-        if (!data || !data.accessToken) return false;
+        const newAccessToken = data.accessToken || data.AccessToken;
+        const newRefreshToken = data.refreshToken || data.RefreshToken;
 
-        this.setToken(data.accessToken);
-        this.setRefreshToken(data.refreshToken);
+        if (!newAccessToken) {
+          console.error("No access token in refresh response", data);
+          return false;
+        }
 
+        this.setToken(newAccessToken);
+
+        if (newRefreshToken) {
+          this.setRefreshToken(newRefreshToken);
+        }
+
+        console.log("Token refreshed successfully");
         return true;
+      } catch (err) {
+        console.error("Refresh token error:", err);
+        return false;
       } finally {
         this.refreshPromise = null;
       }

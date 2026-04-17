@@ -24,7 +24,7 @@ public class AuthController : ControllerBase
         command = command with { IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString() };
 
         var result = await _mediator.Send(command);
-        return Ok(ApiResponse<LoginResponse>.SuccessResponse(result));
+        return Ok(ApiResponse<LoginResponse>.Ok(result));
     }
 
     [HttpPost("refresh")]
@@ -33,7 +33,7 @@ public class AuthController : ControllerBase
         command = command with { IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString() };
 
         var result = await _mediator.Send(command);
-        return Ok(ApiResponse<RefreshTokenResponse>.SuccessResponse(result));
+        return Ok(ApiResponse<RefreshTokenResponse>.Ok(result));
     }
     
     [HttpPost("logout")]
@@ -45,7 +45,7 @@ public class AuthController : ControllerBase
         var command = new LogoutCommand(refreshToken, ip, jwt);
 
         await _mediator.Send(command);
-        return Ok(ApiResponse<string>.SuccessResponse("Logged out"));
+        return Ok(ApiResponse<string>.Ok("Logged out"));
     }
     
     [Authorize]
@@ -60,6 +60,6 @@ public class AuthController : ControllerBase
         );
 
         await _mediator.Send(command);
-        return Ok(ApiResponse<string>.SuccessResponse("Logged out"));
+        return Ok(ApiResponse<string>.Ok("Logged out"));
     }
 }

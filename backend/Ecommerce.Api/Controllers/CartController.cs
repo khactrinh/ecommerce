@@ -30,7 +30,7 @@ public class CartController : ControllerBase
         
         await _mediator.Send(new AddToCartCommand(userId, request.ProductId, request.Quantity));
         
-        return Ok(ApiResponse<string>.SuccessResponse("Item added to cart"));
+        return Ok(ApiResponse<string>.Ok("Item added to cart"));
     }
 
     [HttpGet]
@@ -40,7 +40,7 @@ public class CartController : ControllerBase
         
         var result = await _mediator.Send(new GetCartQuery(userId));
         
-        return Ok(ApiResponse<List<CartResponse>>.SuccessResponse(result));
+        return Ok(ApiResponse<List<CartResponse>>.Ok(result));
     }
 
     [HttpPost("update")]
@@ -50,7 +50,7 @@ public class CartController : ControllerBase
         
         await _mediator.Send(new UpdateQuantityCommand(userId, request.ProductId, request.Quantity));
         
-        return Ok(ApiResponse<string>.SuccessResponse("Quantity updated"));
+        return Ok(ApiResponse<string>.Ok("Quantity updated"));
     }
 
     [HttpPost("remove")]
@@ -60,7 +60,7 @@ public class CartController : ControllerBase
         
         await _mediator.Send(new RemoveItemCommand(userId, request.ProductId));
         
-        return Ok(ApiResponse<string>.SuccessResponse("Item removed from cart"));
+        return Ok(ApiResponse<string>.Ok("Item removed from cart"));
     }
 }
 

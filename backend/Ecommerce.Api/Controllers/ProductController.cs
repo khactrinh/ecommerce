@@ -1,16 +1,13 @@
-using Ecommerce.Application.Catalog.GetProducts;
-using Ecommerce.Application.Catalog.Products.Commands;
 using Ecommerce.Application.Catalog.Products.Commands.CreateProduct;
 using Ecommerce.Application.Catalog.Products.Queries.GetProductById;
 using Ecommerce.Application.Catalog.Products.Queries.GetProducts;
 using Ecommerce.Shared.Pagination;
 using Ecommerce.Shared.Responses;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Ecommerce.Api.Controllers;
-
-using Microsoft.AspNetCore.Mvc;
-using MediatR;
 
 [Authorize]
 [ApiController]
@@ -29,9 +26,9 @@ public class ProductController : ControllerBase
     {
         var id = await _mediator.Send(command);
 
-        return Ok(ApiResponse<Guid>.SuccessResponse(id));
+        return Ok(ApiResponse<Guid>.Ok(id, "Product created successfully"));
     }
-    
+
     [HttpGet]
     [AllowAnonymous]
     public async Task<IActionResult> Get([FromQuery] ProductFilter filter)
@@ -39,17 +36,22 @@ public class ProductController : ControllerBase
         var result = await _mediator.Send(new GetProductsQuery(filter));
 
         return Ok(ApiResponse<PagedResult<ProductListItemResponse>>
-            .SuccessResponse(result));
+            .Ok(result));
     }
 
-    
     [HttpGet("{id}")]
     [AllowAnonymous]
     public async Task<IActionResult> GetById(Guid id)
     {
         var result = await _mediator.Send(new GetProductByIdQuery(id));
 
+        if (result is null)
+        {
+            return NotFound(ApiResponse<string>
+                .Fail("Product not found"));
+        }
+
         return Ok(ApiResponse<ProductDetailResponse>
-            .SuccessResponse(result));
+            .Ok(result));
     }
 }

@@ -10,7 +10,9 @@ import CategoryMenu from "./category-menu";
 export default function Header() {
   const { user, logout } = useAuth();
   const { totalItems } = useCart();
-  const { categories } = useCategories();
+  //const { categories } = useCategories();
+
+  const { data: categories, isLoading } = useCategories();
 
   return (
     <header className="bg-white/80 backdrop-blur-md border-b sticky top-0 z-50">
@@ -26,7 +28,7 @@ export default function Header() {
         {/* Categories Desktop */}
         {/* Categories Desktop */}
         <nav className="hidden md:flex items-center gap-6">
-          <CategoryMenu categories={categories.slice(0, 5)} />
+          <CategoryMenu categories={categories?.slice(0, 5)} />
         </nav>
 
         {/* Search */}

@@ -1,6 +1,5 @@
 "use client";
 
-import Button from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 
 export default function HeroBanner() {
@@ -41,7 +40,8 @@ export default function HeroBanner() {
 
           {/* Description */}
           <p className="text-white/90 text-lg md:text-xl font-medium leading-relaxed max-w-lg drop-shadow-md">
-            Meticulously crafted hardware for the modern professional. Experience power and elegance in every detail.
+            Meticulously crafted hardware for the modern professional.
+            Experience power and elegance in every detail.
           </p>
 
           {/* Buttons */}
@@ -65,11 +65,15 @@ export default function HeroBanner() {
           <div className="flex gap-10 pt-4 opacity-70">
             <div className="text-white">
               <p className="text-2xl font-black">24k+</p>
-              <p className="text-[10px] uppercase tracking-widest font-bold">Happy Clients</p>
+              <p className="text-[10px] uppercase tracking-widest font-bold">
+                Happy Clients
+              </p>
             </div>
             <div className="text-white">
               <p className="text-2xl font-black">4.9/5</p>
-              <p className="text-[10px] uppercase tracking-widest font-bold">Average Rating</p>
+              <p className="text-[10px] uppercase tracking-widest font-bold">
+                Average Rating
+              </p>
             </div>
           </div>
         </div>

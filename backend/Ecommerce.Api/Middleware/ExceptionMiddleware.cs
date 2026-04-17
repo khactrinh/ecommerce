@@ -59,7 +59,7 @@ public class ExceptionMiddleware
                 g => g.Select(x => x.ErrorMessage).ToArray()
             );
 
-        var body = ApiResponse<object>.FailResponse(
+        var body = ApiResponse<object>.Fail(
             "Validation failed",
             errors,
             traceId
@@ -73,7 +73,7 @@ public class ExceptionMiddleware
         string traceId,
         HttpStatusCode statusCode)
     {
-        var body = ApiResponse<object>.FailResponse(message, null, traceId);
+        var body = ApiResponse<object>.Fail(message, null, traceId);
 
         return (statusCode, body);
     }

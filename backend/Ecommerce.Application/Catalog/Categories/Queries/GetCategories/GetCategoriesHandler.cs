@@ -1,3 +1,5 @@
+using Ecommerce.Application.Catalog.Categories.Dtos;
+
 namespace Ecommerce.Application.Catalog.Categories.Queries.GetCategories;
 
 using Dapper;
@@ -6,11 +8,8 @@ using MediatR;
 using System.Data;
 using System.Text;
 
-
-
-
 public class GetCategoriesHandler 
-    : IRequestHandler<GetCategoriesQuery, PagedResult<CategoryListItemResponse>>
+    : IRequestHandler<GetCategoriesQuery, PagedResult<CategoryResponse>>
 {
     private readonly IDbConnection _connection;
 
@@ -19,7 +18,7 @@ public class GetCategoriesHandler
         _connection = connection;
     }
 
-    public async Task<PagedResult<CategoryListItemResponse>> Handle(
+    public async Task<PagedResult<CategoryResponse>> Handle(
         GetCategoriesQuery request,
         CancellationToken cancellationToken)
     {
@@ -62,7 +61,7 @@ public class GetCategoriesHandler
         parameters.Add("Offset", (filter.PageNumber - 1) * filter.PageSize);
         parameters.Add("PageSize", filter.PageSize);
 
-        var items = (await _connection.QueryAsync<CategoryListItemResponse>(
+        var items = (await _connection.QueryAsync<CategoryResponse>(
             dataSql,
             parameters)).ToList();
         
