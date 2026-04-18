@@ -1,20 +1,20 @@
-export interface Category {
-  id: string;
-  name: string;
-  slug: string;
-  parentId: string | null;
-  children: Category[];
-}
-
-export interface Product {
-  id: string;
-  name: string;
-  price: number;
-  imageUrl: string;
-  stock: number;
-  description?: string;
-  categoryId?: string;
-}
+// export interface Category {
+//   id: string;
+//   name: string;
+//   slug: string;
+//   parentId: string | null;
+//   children: Category[];
+// }
+//
+// export interface Product {
+//   id: string;
+//   name: string;
+//   price: number;
+//   imageUrl: string;
+//   stock: number;
+//   description?: string;
+//   categoryId?: string;
+// }
 
 // ✅ ADD THIS
 export interface CartItem {

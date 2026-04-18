@@ -3,6 +3,7 @@ export type Category = {
     name: string;
     slug: string;
     parentId?: string | null;
+    children?: Category[];
 };
 
 export type CategoryDetail = Category & {

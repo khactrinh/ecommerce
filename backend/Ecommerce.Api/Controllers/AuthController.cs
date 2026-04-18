@@ -1,8 +1,6 @@
 using Ecommerce.Application.Auth.Login;
-using Ecommerce.Application.Auth.Refresh;
 using Ecommerce.Application.Features.Auth.Logout;
 using Ecommerce.Application.Features.Auth.Refresh;
-using Ecommerce.Shared.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -21,33 +19,44 @@ public class AuthController : ControllerBase
     [HttpPost("login")]
     public async Task<IActionResult> Login(LoginCommand command)
     {
-        command = command with { IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString() };
+        command = command with
+        {
+            IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString()
+        };
 
         var result = await _mediator.Send(command);
-        return Ok(ApiResponse<LoginResponse>.Ok(result));
+
+        return Ok(result); // 🔥 clean
     }
 
     [HttpPost("refresh")]
     public async Task<IActionResult> Refresh(RefreshTokenCommand command)
     {
-        command = command with { IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString() };
+        command = command with
+        {
+            IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString()
+        };
 
         var result = await _mediator.Send(command);
-        return Ok(ApiResponse<RefreshTokenResponse>.Ok(result));
+
+        return Ok(result);
     }
-    
+
     [HttpPost("logout")]
     public async Task<IActionResult> Logout([FromBody] string refreshToken)
     {
         var jwt = HttpContext.Request.Headers["Authorization"]
             .FirstOrDefault()?.Replace("Bearer ", "");
+
         var ip = HttpContext.Connection.RemoteIpAddress?.ToString();
+
         var command = new LogoutCommand(refreshToken, ip, jwt);
 
         await _mediator.Send(command);
-        return Ok(ApiResponse<string>.Ok("Logged out"));
+
+        return Ok("Logged out"); // 🔥 middleware sẽ wrap
     }
-    
+
     [Authorize]
     [HttpPost("logout-all")]
     public async Task<IActionResult> LogoutAll()
@@ -60,6 +69,7 @@ public class AuthController : ControllerBase
         );
 
         await _mediator.Send(command);
-        return Ok(ApiResponse<string>.Ok("Logged out"));
+
+        return Ok("Logged out");
     }
 }

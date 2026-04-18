@@ -1,8 +1,6 @@
 using Ecommerce.Application.Catalog.Products.Commands.CreateProduct;
 using Ecommerce.Application.Catalog.Products.Queries.GetProductById;
 using Ecommerce.Application.Catalog.Products.Queries.GetProducts;
-using Ecommerce.Shared.Pagination;
-using Ecommerce.Shared.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -26,7 +24,7 @@ public class ProductController : ControllerBase
     {
         var id = await _mediator.Send(command);
 
-        return Ok(ApiResponse<Guid>.Ok(id, "Product created successfully"));
+        return Ok(id); // 🔥 middleware wrap
     }
 
     [HttpGet]
@@ -35,8 +33,7 @@ public class ProductController : ControllerBase
     {
         var result = await _mediator.Send(new GetProductsQuery(filter));
 
-        return Ok(ApiResponse<PagedResult<ProductListItemResponse>>
-            .Ok(result));
+        return Ok(result);
     }
 
     [HttpGet("{id}")]
@@ -46,12 +43,8 @@ public class ProductController : ControllerBase
         var result = await _mediator.Send(new GetProductByIdQuery(id));
 
         if (result is null)
-        {
-            return NotFound(ApiResponse<string>
-                .Fail("Product not found"));
-        }
+            return NotFound("Product not found");
 
-        return Ok(ApiResponse<ProductDetailResponse>
-            .Ok(result));
+        return Ok(result);
     }
 }

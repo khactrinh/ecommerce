@@ -1,5 +1,7 @@
 using System.Text;
-using Ecommerce.Api.Middleware;
+using System.Text.Json;
+using Ecommerce.Api.Extensions;
+using Ecommerce.Api.Middlewares;
 using Ecommerce.Application;
 using Ecommerce.Application.Common.Models;
 using Ecommerce.Application.Orders.Sagas;
@@ -10,6 +12,7 @@ using Ecommerce.Infrastructure.Persistence;
 using Ecommerce.Infrastructure.Persistence.Dapper;
 using Ecommerce.Infrastructure.Persistence.Sagas;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Http.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
@@ -135,11 +138,20 @@ builder.Services.AddScoped<OrderSaga>();
 builder.Services.AddApplication();
 
 // Controllers
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+    });
 
-
+builder.Services.Configure<JsonOptions>(options =>
+{
+    options.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+});
 
 var app = builder.Build();
+
+app.UseCustomMiddlewares(); // 🔥 ADD HERE
 
 DapperConfig.Configure();
 
